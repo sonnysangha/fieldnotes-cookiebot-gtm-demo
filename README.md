@@ -12,7 +12,7 @@ This guide covers the setup from an empty GTM container, the exact demonstration
 
 ## Contents
 
-1. [The story to teach](#1-the-story-to-teach)
+1. [The story to teach](#1-the-story-to-teach) — [installation choices](#choose-the-installation-before-opening-gtm), [quick script route](#the-quickest-route-to-demonstrate-the-direct-script), [Consent Mode](#where-google-consent-mode-fits), [why each setting matters](#why-each-setup-choice-matters)
 2. [Prepare for the recording](#2-prepare-for-the-recording)
 3. [Understand the existing demo](#3-understand-the-existing-demo)
 4. [Run your own copy](#4-run-your-own-copy)
@@ -67,6 +67,123 @@ No receipt                           “Tag fired” receipt
 
 For this video, teach waiting for consent. Google distinguishes Basic mode, which blocks Google tags before consent, from Advanced mode, which loads Google tags under denied defaults and can send cookieless pings. This project demonstrates consent-gated custom tags; it does not demonstrate Google's cookieless measurement. [Google's consent-mode overview](https://developers.google.com/tag-platform/security/concepts/consent-mode).
 
+### Choose the installation before opening GTM
+
+**Opening explanation to read on camera:**
+
+> “Start with where your tracking is installed. If you can edit your website header and want the quickest starting point, Cookiebot's direct script with automatic blocking is the route to show first. If your tags already live in Google Tag Manager, GTM gives you one place to configure and inspect their consent rules. Google Consent Mode adds another layer: it tells supported Google tags how to behave based on the visitor's choice. It isn't an alternative banner.”
+
+Treat this as **two decisions**, not three competing products:
+
+1. **Where does Cookiebot load, and what controls the scripts?** Direct installation, a platform plugin, or a GTM installation.
+2. **If you use Google measurement, what should happen before permission?** Basic or Advanced Consent Mode.
+
+| Option | Value to explain | What the viewer must still do |
+|---|---|---|
+| Direct script + automatic blocking | My quickest starting route for a simple website with access to its header. Cookiebot handles the banner and uses its blocking configuration to control identified cookie-setting resources. | Place it correctly, complete/review the scan, classify resources and test the site's real integrations. |
+| Platform plugin/integration | Useful when the CMS offers a supported installation flow and you prefer its settings screen to editing a template. | Follow that platform's coverage instructions; verify landing pages and checkout as well as the homepage. |
+| Cookiebot through GTM | Useful when tags already live in GTM. You can inspect the trigger, consent requirement and execution result together, and version the configuration. | Configure each tag appropriately; account for scripts outside the container. This is the route used in Fieldnotes. |
+| Direct auto-blocking + GTM | Useful for a mixed site with both embedded scripts and GTM-managed tags. | Follow the combined installation instructions, including script order and exclusions; install the CMP only once. |
+| Direct script + manual blocking | Useful when a developer needs explicit control over individual embeds or scripts. | Disable each relevant resource initially and add the required consent markup or application logic. |
+
+These are workflow choices, not promises that any route completes every site's consent work automatically. Cookiebot documents both [automatic blocking](https://support.cookiebot.com/hc/en-us/articles/360009074960-Automatic-cookie-blocking) and [manual blocking](https://support.cookiebot.com/hc/en-us/articles/4405978132242-Manual-cookie-blocking).
+
+### The quickest route to demonstrate: the direct script
+
+**Show this on a separate simple page, not inside this project's GTM-based After installation.**
+
+1. Register the deployed hostname and configure its banner in Cookiebot.
+2. Open **Implementation → CMP Banner → Auto blocking** and copy the generated script for that domain group.
+3. For the standalone route, put it as the first script in the site's `<head>`, before cookie-setting resources. Keep automatic blocking enabled; do not add `async` or `defer` to that script.
+4. Publish the website. Check the actual rendered page, not only the editor field.
+5. Review the completed scan, classifications and any reported blocking issues.
+6. Test before consent, after a category grant and after withdrawal. Use browser storage **and** network requests; absence of a cookie alone does not prove absence of data transmission.
+
+**Say:**
+
+> “This is the quickest install I'm showing: copy the auto-blocking script into the header, then verify it. Automatic blocking uses Cookiebot's scan and classifications to identify the resources it should hold back. Copying the script is the installation step; checking what actually loads is the proof.”
+
+Resources that already ran before the blocker cannot be retrospectively prevented. Server-set cookies need server-side handling. [Cookiebot automatic-blocking instructions and troubleshooting](https://support.cookiebot.com/hc/en-us/articles/360009074960-Automatic-cookie-blocking).
+
+**A mixed GTM site needs its own recipe.** Cookiebot's combined guide specifies denied Consent Mode defaults, then GTM, then the auto-blocking CMP script, with the consent-default and GTM scripts marked `data-cookieconsent="ignore"`. Its GTM CMP tag must not also load Cookiebot. Keep consent controls on the tracking tags within GTM; allowing the container loader to run is not permission for every tag. [Combined auto-blocking and GTM installation](https://support.cookiebot.com/hc/en-us/articles/360009192739-Google-Tag-Manager-and-Automatic-cookie-blocking).
+
+For this video, explain that mixed route briefly and continue with the isolated Fieldnotes GTM route. Don't splice the standalone script instructions into the GTM build halfway through.
+
+### Why use GTM for this demonstration?
+
+Our teaching goal is to make **an attempted purchase event and an executed tracking tag visibly different**. The site's event log and GTM Preview give us two views of the same action.
+
+**Say:**
+
+> “GTM is useful here because I can show the rule next to the tag. When someone buys a notebook, the shop reports a purchase internally. GTM then checks whether our analytics demonstration tag is allowed to run. The purchase still works if the visitor says no.”
+
+In Fieldnotes, all optional demonstration tags are deliberately inside GTM. We use the official CMP template to supply consent state and explicit additional checks to gate the four custom tags. No direct auto-blocking script is installed in this route. A real site's external video embeds, CMS integrations or hard-coded pixels would need separate review and controls; moving the banner into GTM does not move those resources into GTM.
+
+### Where Google Consent Mode fits
+
+Consent Mode communicates choices to supported Google measurement tags. Its value is that Google's measurement behavior can respond to those choices. It does not provide the banner, and it does not automatically make an unrelated Meta pixel or custom HTML script consent-aware. GTM is optional for Consent Mode: a direct Google-tag installation can also implement it. [Google's consent implementation guide](https://developers.google.com/tag-platform/security/guides/consent).
+
+| Google behavior | Before relevant consent is granted | Why a site might choose it |
+|---|---|---|
+| Basic | Google measurement tags are held back; denied visitors do not send measurement through those tags. | The desired behavior is to wait for permission before starting Google measurement. |
+| Advanced | Google tags can load with denied defaults and send cookieless measurements. Granted categories change their behavior. | The site wants consent-aware measurement with additional signals for modeling, including when storage is denied. |
+
+Advanced is a different data-collection choice, not simply a better installation. Cookieless does not mean no data is sent. Modeling is estimation, not recovery of every individual visitor's actions. [Google's Basic/Advanced comparison](https://developers.google.com/tag-platform/security/concepts/consent-mode).
+
+**Say:**
+
+> “We're teaching a wait-for-permission experience. With Google measurement, that's the Basic direction. Advanced can still send cookieless signals when consent is denied. Our core demo uses local tags so you can see the blocking without sending sample purchases into a real analytics account.”
+
+**V2 is a separate distinction from Basic/Advanced.** V2 added `ad_user_data` and `ad_personalization` alongside the established `ad_storage` and `analytics_storage` signals. Check all four in Tag Assistant: defaults must be set early and updates must reflect the visitor's choices. Seeing a banner or a `G-…` measurement ID alone doesn't confirm V2. [Google's V2 setup guidance](https://developers.google.com/tag-platform/security/guides/consent).
+
+### Explain the blocking with one purchase
+
+Use this exact Fieldnotes example while the inspector is open:
+
+| Stage | What happens | What to point at |
+|---|---|---|
+| Before choosing | Optional consent starts denied for this demo. | Cookiebot and the inspector's category states. |
+| Add one notebook and order | The shop completes the £18 sample order and pushes its internal `purchase` event. | Thank-you screen and `purchase → dataLayer`. |
+| GTM evaluates the event | `Demo - Shop Events` matches `purchase`; the shop receipt tag requires `analytics_storage`. | The trigger and consent requirement in GTM. |
+| Statistics denied | GTM does not execute that tag. | No purchase Tag fired receipt; tracked-action count stays zero. |
+| Grant Statistics and make a new order | The same rule now permits the tag; it dispatches a local receipt. | Purchase Tag fired badge and increased tracked-action count. |
+| Withdraw and make another order | This app clears its three demo cookies and reloads; future shop receipts are blocked again. | Fresh denied state, successful order and zero tracked actions. |
+
+**Say:**
+
+> “A dataLayer event says something happened in the shop. A Tag fired badge says our GTM tag actually executed. The consent check sits between those two things. That's why you can still see purchase after rejecting analytics.”
+
+The blocked events in this project are not replayed after a later grant. Its withdrawal reload is explicit application code, not a feature to assume every banner installation implements. Section 11 gives the exact recording sequence and counter expectations.
+
+### Why each setup choice matters
+
+Use these explanations while following section 7, rather than reading unexplained settings aloud:
+
+| Setup choice in this demo | Reason to explain | Mistake it helps avoid |
+|---|---|---|
+| Correct domain group and hostname | The banner must use the configuration intended for this site. | Testing the wrong banner or an unauthorized hostname. |
+| CMP on Consent Initialization | Consent setup gets an early execution opportunity. | Measurement starting before its consent state is established. |
+| No optional-consent gate on the CMP | Visitors need the banner to make their first choice. | A banner waiting for permission that visitors cannot give. |
+| Optional defaults denied | This experiment starts with optional tracking off. | Treating silence as a grant. |
+| `cookie_consent_update` for category tags | These tags get an opportunity after choices are available. | A denied All Pages attempt never retrying on that first page. |
+| `analytics_storage` on Statistics and shop receipts | Those examples represent statistical tracking. | Confusing an event name with a permission name. |
+| `ad_storage` on the marketing example | That example writes a marketing-category demo cookie. | Calling every optional tag “analytics.” |
+| `functionality_storage` on the preferences example | It represents optional preference storage. | Bundling optional preferences into necessary storage. |
+| Exact shop-event regex | Only additions and purchases trigger this receipt tag. | Counting consent updates as purchases or shop actions. |
+| Successful category guard; shop tag once per event | Initialize each permitted demo category once, but measure each new shop action. | Duplicate initialization or only one tracked action per page. |
+| Preview, then publish, then retest | Draft configuration and public configuration can differ. | Showing a successful preview while visitors receive old tags. |
+
+The table explains this project's configuration. For the general mechanics of initialization, built-in checks and additional firing requirements, see [Google's GTM consent controls](https://support.google.com/tagmanager/answer/10718549). A built-in Google consent check can adapt behavior; an additional check can prevent firing. That distinction is why a Basic setup can need a gate even when a Google tag already lists built-in checks.
+
+### The finish line to explain to viewers
+
+**Say:**
+
+> “We haven't finished just because the banner appears. We finish when the right tags stay blocked before permission, the right category starts them after permission, each action is counted once, and changing your choice affects future tracking. Then we publish and repeat the checks on the public site.”
+
+For a real analytics extension, add one more proof: inspect the destination's requests and debug view for the correct event, value, currency and transaction ID. A local receipt alone cannot establish that Google Analytics or Meta received the purchase. Keep one deliberate delivery path for each destination; audit native CMS integrations alongside GTM before enabling a second copy.
+
+
 ## 2. Prepare for the recording
 
 Use a desktop browser wide enough to show the storefront and the right-hand inspector. On narrow screens the inspector docks at the bottom. It scrolls independently from the shop.
@@ -88,7 +205,7 @@ Before filming:
 6. Clear or withdraw previous consent before the denied-consent take.
 7. Close personal account menus before filming.
 
-**Suggested edit structure:** hook → short explanation → container setup → consent checks → denied test → accepted test → withdrawal → recap. Keep the optional GA4 discussion after the core demo.
+**Suggested edit structure:** hook → direct-script quick start → installation choices → Basic/Advanced explanation → why this demo uses GTM → container setup with reasons → denied test → accepted test → withdrawal → recap. Keep the optional GA4 discussion after the core demo.
 
 ## 3. Understand the existing demo
 
