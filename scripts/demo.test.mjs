@@ -8,8 +8,9 @@ function boot(config = {}, search = "") {
  const nodes = new Map(), loads = [], listeners = {};
  function node() { return { textContent:'', dataset:{}, children:[], hidden:true, disabled:false, setAttribute(){}, append(...v){this.children.push(...v);}, prepend(v){this.children.unshift(v);}, querySelector(){return null;}, replaceChildren(){this.children=[];}, scrollIntoView(){}, remove(){} }; }
  const document = { getElementById(id) { if (!nodes.has(id)) nodes.set(id,node());return nodes.get(id);}, createElement:node, createTextNode:t=>t, head:{append:s=>loads.push(s.src)} };
- const window = { DEMO_CONFIG:config, addEventListener:(k,f)=>listeners[k]=f };
- vm.runInNewContext(code,{window,document,location:{hostname:'localhost',search,reload(){}},URLSearchParams,crypto:webcrypto,Date});
+ const window = { testReloads:0,testCookieWrites:[], DEMO_CONFIG:config, addEventListener:(k,f)=>listeners[k]=f };
+ Object.defineProperty(document,'cookie',{get:()=>'',set:v=>window.testCookieWrites.push(v)});
+ vm.runInNewContext(code,{window,document,location:{hostname:'localhost',search,reload(){window.testReloads++;}},URLSearchParams,crypto:webcrypto,Date});
  return {nodes,loads,window,listeners};
 }
 test('unconfigured demo makes no external script requests',()=>assert.deepEqual(boot().loads,[]));
@@ -25,21 +26,19 @@ test('each completed cart has one purchase and a distinct transaction ID',()=>{
 });
 test('import has no production destinations or catch-all event triggers',()=>{
  const text=readFileSync('gtm/demo-basic-consent.import.json','utf8'), c=JSON.parse(text).containerVersion;
- for (const id of ['G-EXAMPLEPROD','GTM-EXAMPLEPROD','PRODUCTION_PIXEL_ID']) assert.equal(text.includes(id),false);
+ assert.ok(c.tag.every(t=>t.type==='html' || t.name==='Cookiebot - Demo CMP'));
+ const shopTrigger=c.trigger.find(t=>t.name==='Demo - Shop Events');
+ assert.ok(JSON.stringify(shopTrigger).includes('^(add_to_cart|purchase)$'));
  assert.equal(c.tag.length,5);assert.equal(c.tag.filter(t=>t.consentSettings.consentStatus==='NEEDED').length,4);
 });
 
-test('before and after load only their dedicated container',()=>{
- const config={baselineGtmId:'GTM-BEFORE1',gtmId:'GTM-AFTER1',cookiebotId:'11111111-1111-4111-8111-111111111111',allowedHosts:['localhost']};
- assert.deepEqual(boot(config,'?mode=before').loads,['https://www.googletagmanager.com/gtm.js?id=GTM-BEFORE1']);
- assert.deepEqual(boot(config,'?mode=after').loads,['https://www.googletagmanager.com/gtm.js?id=GTM-AFTER1']);
- assert.deepEqual(boot({...config,gtmId:''},'?mode=after').loads,[]);
-});
-test('baseline has no CMP and uses the same local receipt tags without consent gates',()=>{
- const c=JSON.parse(readFileSync('gtm/demo-before-banner.import.json','utf8')).containerVersion;
- assert.equal(c.tag.length,4);assert.equal(c.customTemplate.length,0);
- assert.ok(c.tag.every(t=>t.consentSettings.consentStatus==='NOT_NEEDED'));
- assert.equal(c.tag.filter(t=>t.firingTriggerId.includes('2147479553')).length,3);
+test('all URLs load exactly one consent-controlled container, including old mode links',()=>{
+ const config={gtmId:'GTM-DEMO123',cookiebotId:'11111111-1111-4111-8111-111111111111',allowedHosts:['localhost']};
+ for (const search of ['', '?mode=before', '?mode=after', '?mode=anything']) {
+  assert.deepEqual(boot(config,search).loads,['https://www.googletagmanager.com/gtm.js?id=GTM-DEMO123']);
+ }
+ assert.deepEqual(boot({...config,gtmId:''}).loads,[]);
+ assert.deepEqual(boot({...config,cookiebotId:''}).loads,[]);
 });
 
 test('consent retry tags allow later events but execute only once per page',()=>{
@@ -64,4 +63,17 @@ test('visual shop tracking count requires a real receipt rather than a shop acti
  listeners['demo-tag-fired']({detail:'Consented shop event'});
  assert.equal(nodes.get('shop-tag-count').textContent,1);
  assert.equal(nodes.get('action-count').textContent,2);
+});
+
+test('withdrawing a granted category clears demo cookies and reloads the page',()=>{
+ const {window,listeners,nodes}=boot();
+ window.Cookiebot={consent:{statistics:true,marketing:false,preferences:false}};
+ listeners.CookiebotOnAccept();
+ assert.equal(nodes.get('tracking-gate').dataset.state,'allowed');
+ window.Cookiebot.consent.statistics=false;
+ listeners.CookiebotOnDecline();
+ assert.equal(nodes.get('tracking-gate').dataset.state,'denied');
+ assert.equal(window.testReloads,1);
+ assert.equal(window.testCookieWrites.length,3);
+ assert.ok(window.testCookieWrites.every(v=>v.includes('Max-Age=0')));
 });

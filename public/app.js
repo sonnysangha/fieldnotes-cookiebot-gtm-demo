@@ -1,14 +1,12 @@
 (() => {
   const $ = id => document.getElementById(id);
   const config = window.DEMO_CONFIG || {};
-  const before = new URLSearchParams(location.search).get('mode') === 'before';
-  const containerId = before ? config.baselineGtmId : config.gtmId;
-  $('before-link').setAttribute('aria-current', before ? 'page' : 'false');
-  $('after-link').setAttribute('aria-current', before ? 'false' : 'page');
-  $('mode-description').textContent = before ? 'Before: demo tags run without asking for consent.' : 'After: tags wait for your Cookiebot consent.';
-  if (before) { $('state-description').textContent = 'No CMP is installed in this view. The receipts below show the real baseline GTM tags running.'; $('first-step').textContent = '1. Observe the page load'; $('first-step-detail').textContent = 'The three demo tags run without asking. Their cookies appear below.'; }
-  $('settings').disabled = true; $('withdraw').disabled = true; $('declaration-toggle').disabled = before;
-  const valid = /^GTM-[A-Z0-9]+$/.test(containerId || '') && (before || /^[a-f0-9-]{36}$/i.test(config.cookiebotId || '')) && (config.allowedHosts || []).includes(location.hostname);
+  const containerId = config.gtmId;
+  $('settings').disabled = true;
+  $('withdraw').disabled = true;
+  $('demo-cookie-settings').disabled = true;
+  const valid = /^GTM-[A-Z0-9]+$/.test(containerId || '') && /^[a-f0-9-]{36}$/i.test(config.cookiebotId || '') && (config.allowedHosts || []).includes(location.hostname);
+  $('declaration-toggle').disabled = !valid;
   window.dataLayer = window.dataLayer || [];
   let quantity = 0, receipts = 0, actions = 0, shopReceipts = 0, previous, activeShopEvent;
   const item = { item_id: 'DEMO-NOTEBOOK', item_name: 'Everyday Notebook', price: 18 };
@@ -32,8 +30,8 @@
   }
   function updateGate() {
     const c = window.Cookiebot?.consent;
-    $('tracking-gate').dataset.state = before ? 'baseline' : !c ? 'waiting' : c.statistics ? 'allowed' : 'denied';
-    $('tracking-gate').textContent = before ? 'Tracking allowed — no banner' : !c ? 'Waiting for Cookiebot' : c.statistics ? '✓ Tracking allowed' : '✕ Tracking blocked';
+    $('tracking-gate').dataset.state = !c ? 'waiting' : c.statistics ? 'allowed' : 'denied';
+    $('tracking-gate').textContent = !c ? 'Waiting for Cookiebot' : c.statistics ? '✓ Tracking allowed' : '✕ Tracking blocked';
   }
   function emit(event, ecommerce) {
     if (event === 'add_to_cart' || event === 'purchase') {
@@ -62,13 +60,13 @@
     const c = window.Cookiebot?.consent;
     for (const k of ['necessary', 'preferences', 'statistics', 'marketing']) {
       const v = c ? (k === 'necessary' ? true : !!c[k]) : undefined;
-      $(k).textContent = v === undefined ? (before ? 'Not collected' : 'Unknown') : v ? 'Allowed' : 'Denied'; $(k).dataset.value = String(v);
+      $(k).textContent = v === undefined ? 'Unknown' : v ? 'Allowed' : 'Denied'; $(k).dataset.value = String(v);
     }
     updateGate();
-    if (!before && c && !c.statistics) $('last-tracking').textContent = 'Shopping still works. Analytics tracking is blocked.';
+    if (c && !c.statistics) $('last-tracking').textContent = 'Shopping still works. Analytics tracking is blocked.';
     if (c?.statistics && !shopReceipts) $('last-tracking').textContent = 'No shop actions tracked yet. Try Add to bag.';
     if (!c) return;
-    $('settings').disabled = before; $('withdraw').disabled = before; $('demo-cookie-settings').disabled = before;
+    $('settings').disabled = false; $('withdraw').disabled = false; $('demo-cookie-settings').disabled = false;
     $('connection').textContent = 'Cookiebot connected. Consent shown below comes from the banner.';
     const next = { preferences: !!c.preferences, statistics: !!c.statistics, marketing: !!c.marketing };
     log('Consent state updated');
@@ -77,7 +75,7 @@
   }
   ['CookiebotOnConsentReady', 'CookiebotOnAccept', 'CookiebotOnDecline'].forEach(e => window.addEventListener(e, consent));
   window.addEventListener('demo-tag-fired', e => {
-    let receiptLabel = before ? String(e.detail).replace('Consented', 'Unrestricted') : e.detail;
+    let receiptLabel = e.detail;
     if (String(e.detail).toLowerCase().includes('shop event')) {
       if (activeShopEvent) receiptLabel = activeShopEvent + ' tracking';
       if (activeShopEvent === 'purchase') $('order-tracking').textContent = '✓ Purchase tracking tag fired.';
@@ -101,7 +99,7 @@
     $('order-items').textContent = `${count} Everyday Notebook${count > 1 ? 's' : ''} · Sage · £18 each`;
     $('order-total').textContent = `£${count * 18}.00`;
     $('order-reference').textContent = 'Order reference: ' + transactionId;
-    $('order-tracking').textContent = before || window.Cookiebot?.consent.statistics ? 'Order complete. Waiting for a tracking receipt.' : 'Order complete. Purchase tracking is blocked by your consent choice.';
+    $('order-tracking').textContent = window.Cookiebot?.consent.statistics ? 'Order complete. Waiting for a tracking receipt.' : 'Order complete. Purchase tracking is blocked by your consent choice.';
     $('bag-contents').hidden = true; $('order-confirmation').hidden = false;
     $('bag-heading').textContent = 'Order confirmed';
     emit('purchase', { transaction_id: transactionId, currency: 'GBP', value: count * 18, items: [{ ...item, quantity: count }] });
@@ -119,10 +117,9 @@
     if (!$('declaration').hidden) $('declaration').scrollIntoView({ block: 'start' });
   };
   if (valid) {
-    $('connection').textContent = before ? 'Loading baseline GTM. No banner or consent gates in this experiment.' : 'Loading the dedicated demo GTM container…';
+    $('connection').textContent = 'Loading Google Tag Manager…';
     window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
-    const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtm.js?id=' + containerId + (!before && config.gtmRevision ? '&demo_revision=' + encodeURIComponent(config.gtmRevision) : ''); document.head.append(s);
-    s.onload = () => { if (before) $('connection').textContent = 'Baseline GTM loaded. Demo tags have no consent gates. Check the receipts below.'; };
+    const s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtm.js?id=' + containerId; document.head.append(s);
     s.onerror = () => $('connection').textContent = 'GTM was blocked or could not load. Check your connection or extension settings.';
   }
   $('refresh-diagnostics').onclick = () => {

@@ -2,9 +2,9 @@
 
 [← Back to the quick setup](README.md)
 
-Use this guide when recording the tutorial or building the tags manually. **Start with one After container:** demonstrate denied, granted and withdrawn consent there. The Before container described below is optional and documents the hosted comparison. For the shortest setup route, follow the README first.
+Use this guide when recording the tutorial or building the tags manually. **Use one container throughout:** demonstrate denied, granted and withdrawn consent by changing the banner choice. There is no unrestricted mode. For the shortest setup route, follow the README first.
 
-**[Sign up for Cookiebot by Usercentrics](https://usercentrics.sjv.io/sonnysangha)** · [Live demo](https://fieldnotes-consent-demo-2026.vercel.app/?mode=after)
+**[Sign up for Cookiebot by Usercentrics](https://usercentrics.sjv.io/sonnysangha)** · [Live demo](https://fieldnotes-consent-demo-2026.vercel.app/)
 
 The signup link is Sonny’s affiliate/referral link.
 
@@ -20,11 +20,11 @@ This guide covers the setup from an empty GTM container, the exact demonstration
 4. [Run your own copy](#4-run-your-own-copy)
 5. [Set up Cookiebot](#5-set-up-cookiebot)
 6. [Create the GTM containers](#6-create-the-gtm-containers)
-7. [Build the After container on camera](#7-build-the-after-container-on-camera)
-8. [Build the Before container](#8-build-the-before-container)
+7. [Build the container on camera](#7-build-the-container-on-camera)
+8. [Check the tag inventory](#8-check-the-tag-inventory)
 9. [Import shortcut](#9-import-shortcut)
 10. [Preview and verify in Tag Assistant](#10-preview-and-verify-in-tag-assistant)
-11. [Record the before-and-after demonstration](#11-record-the-before-and-after-demonstration)
+11. [Record the consent demonstration](#11-record-the-consent-demonstration)
 12. [Publish and retest](#12-publish-and-retest)
 13. [Cookie declaration and scan](#13-cookie-declaration-and-scan)
 14. [Answers to explain on camera](#14-answers-to-explain-on-camera)
@@ -92,7 +92,7 @@ These are workflow choices, not promises that any route completes every site's c
 
 ### The quickest route to demonstrate: the direct script
 
-**Show this on a separate simple page, not inside this project's GTM-based After installation.**
+**Show this on a separate simple page, not inside this project's GTM-based installation.**
 
 1. Register the deployed hostname and configure its banner in Cookiebot.
 2. Open **Implementation → CMP Banner → Auto blocking** and copy the generated script for that domain group.
@@ -211,16 +211,9 @@ Before filming:
 
 ## 3. Understand the existing demo
 
-The hosted example has two **separate** web containers:
+The hosted example loads one web container: **Fieldnotes - Cookiebot Demo (`GTM-MSQQRQ6M`)**. That container contains Cookiebot and the four consent-controlled demonstration tags. Use your own container ID for a clone.
 
-| Mode | Live demo container | Contents |
-|---|---|---|
-| Before banner | `GTM-KT722623` | Three category cookie tags and one unrestricted shop-event receipt tag. |
-| With Cookiebot | `GTM-MSQQRQ6M` | Cookiebot CMP, three gated category tags and one gated shop-event receipt tag. |
-
-The mode links perform a full page navigation. Only one container loads per page. These IDs identify the hosted example; use your own IDs for a clone.
-
-The working After container used version 3 in the tested setup. Account names and version numbers may change; use the tag inventory below as your source of truth when rebuilding.
+The same container handles every visit and consent choice. Legacy mode query parameters cannot select a different container. Its tags stay installed when consent changes; the consent checks determine whether they execute.
 
 The inspector is custom code in this project, not a standard Cookiebot feature:
 
@@ -262,9 +255,7 @@ Edit **`public/config.js`**:
 
 ```javascript
 window.DEMO_CONFIG = {
-  baselineGtmId: 'GTM-YOURBEFOREID',
-  gtmId: 'GTM-YOURAFTERID',
-  gtmRevision: '1',
+  gtmId: 'GTM-YOURID',
   cookiebotId: 'YOUR-COOKIEBOT-DOMAIN-GROUP-ID',
   allowedHosts: ['localhost', '127.0.0.1', 'your-demo.example.com']
 };
@@ -311,15 +302,14 @@ Reference: [Cookiebot's GTM deployment guide](https://support.cookiebot.com/hc/e
 
 If you already have a demo account, reuse it. Otherwise use **Create Account**, enter your demo account details and complete Google's account setup.
 
-Create one **Web** container named `Fieldnotes - Cookiebot Demo` for the core tutorial. Copy its `GTM-…` ID into `gtmId` in `public/config.js`, leave `baselineGtmId` blank and use `?mode=after`. Rebuild and redeploy after changing configuration.
+Create one **Web** container named `Fieldnotes - Cookiebot Demo` for the core tutorial. Copy its `GTM-…` ID into `gtmId` in `public/config.js` and open the normal site URL. Rebuild and redeploy after changing configuration.
 
-Only create `Fieldnotes - Before Banner` and fill in `baselineGtmId` if you also want the optional unrestricted comparison from section 8.
 
-In the After container, enable **Admin → Container Settings → Additional Settings → Enable consent overview → Save**. The overview is accessible from the Tags screen. [Google's consent-settings reference](https://support.google.com/tagmanager/answer/10718549).
+In the demo container, enable **Admin → Container Settings → Additional Settings → Enable consent overview → Save**. The overview is accessible from the Tags screen. [Google's consent-settings reference](https://support.google.com/tagmanager/answer/10718549).
 
-**Recording tip:** show the container name and ID before each setup section. The Before container deliberately permits demo tracking; it belongs only on the demonstration site.
+**Recording tip:** show the container name and ID before each setup section. Use the same container for every consent scenario.
 
-## 7. Build the After container on camera
+## 7. Build the container on camera
 
 These steps reproduce the project's supplied container configuration. UI labels can vary slightly as the GTM template updates.
 
@@ -421,33 +411,19 @@ These are artificial category cookies. A production tag's required permissions m
 
 ### F. Review before previewing
 
-![Actual After container with five tags and their triggers](screenshots/gtm/01-after-tags.jpg)
+![Actual demo container with five tags and their triggers](screenshots/gtm/01-after-tags.jpg)
 
 *Actual Fieldnotes GTM capture. Compare your rebuilt tag inventory against these five tags.*
 
-The After container should contain exactly **five tags**, **two custom triggers**, and the Cookiebot ID constant. Cookiebot runs on the built-in Consent Initialization trigger. No GA4, Ads, Meta, Hotjar, chat widget or production tag should appear in this isolated example.
+The demo container should contain exactly **five tags**, **two custom triggers**, and the Cookiebot ID constant. Cookiebot runs on the built-in Consent Initialization trigger. No GA4, Ads, Meta, Hotjar, chat widget or production tag should appear in this isolated example.
 
 Open Consent Overview and show the required permission for each of the four demo tags. The CMP should not wait for optional consent.
 
-## 8. Build the Before container
+## 8. Check the tag inventory
 
-**Optional.** Skip this section for the single-container denied → granted → withdrawn tutorial.
+Before Preview, confirm you have five tags: the CMP and four custom receipt tags. Confirm the CMP uses Consent Initialization and no optional permission gate. The other four tags must require their documented consent categories.
 
-Create a second, separate baseline rather than disabling the CMP in the After container.
-
-1. Switch to `Fieldnotes - Before Banner`.
-2. Create `Demo - Shop Events` with the same expression: `^(add_to_cart|purchase)$`.
-3. Add the three **Before** category scripts from section 18 as Custom HTML tags.
-4. Give those three tags **All Pages** and **Once per page**. Select **No additional consent required**.
-5. Add `Before - Unrestricted shop event receipt` with the supplied shop code.
-6. Give the shop tag **Demo - Shop Events**, **Once per event**, and **No additional consent required**.
-7. Do not add Cookiebot to this baseline container.
-
-It should contain **four tags** and one custom shop-event trigger. The three category cookies appear on load. Additions and purchases produce receipts without asking first.
-
-**Say:**
-
-> “This is the deliberately unrestricted version of the same demo. The shop hasn't changed; the tag configuration has.”
+Do not add an unrestricted duplicate or bypass URL. Test with the same container by changing consent through Cookiebot. The storefront already installs GTM once.
 
 ## 9. Import shortcut
 
@@ -456,17 +432,16 @@ Use this for rehearsal or recovery. For the tutorial, manually build at least th
 Files included:
 
 - [`gtm/demo-basic-consent.import.json`](gtm/demo-basic-consent.import.json)
-- [`gtm/demo-before-banner.import.json`](gtm/demo-before-banner.import.json)
 
 In an **empty rehearsal container**:
 
 1. Open **Admin → Import Container**.
-2. Choose the corresponding JSON file.
+2. Choose `demo-basic-consent.import.json`.
 3. Select the intended workspace.
 4. Use the import preview to inspect changes. In an existing workspace, use Merge and resolve naming conflicts deliberately; Overwrite can remove unrelated configuration.
-5. Confirm the After file adds five tags and two custom triggers, or the Before file four tags and one custom trigger.
+5. Confirm the file adds five tags and two custom triggers.
 6. Complete the import.
-7. For After, set the imported Cookiebot ID constant to your real Domain Group ID.
+7. Set the imported Cookiebot ID constant to your real Domain Group ID.
 8. Verify the official template, consent settings and triggers before Preview.
 9. Set your public container IDs in `public/config.js` and deploy the site.
 
@@ -476,10 +451,10 @@ The public import files contain a placeholder Cookiebot ID and omit our account/
 
 The inspector is useful for the video; **Tag Assistant supplies the GTM-side check**.
 
-1. In the After GTM workspace click **Preview**.
-2. Enter your site's full After URL, including `?mode=after`.
+1. In the demo GTM workspace click **Preview**.
+2. Enter your site's normal deployed URL.
 3. Connect and open the launched site. Use the same browser/session for actions and inspection.
-4. Return to Tag Assistant and select the **After container**, not an unrelated tag or the Before container.
+4. Return to Tag Assistant and select **Fieldnotes - Cookiebot Demo**.
 5. Select the consent initialization event and inspect the CMP tag and default consent state.
 6. On the website choose Deny, add a notebook and place a sample order.
 7. Back in Tag Assistant, select `add_to_cart` or `purchase` in the event timeline. Open the shop receipt tag. Confirm it did not fire because its required consent was not granted, rather than merely because its trigger did not match.
@@ -493,25 +468,17 @@ For Consent Mode V2, inspect these four values: `analytics_storage`, `ad_storage
 
 **Record:** the denied event's consent state and non-fired tag, then the granted event's fired tag. Do not use a screenshot of “Tags Not Fired” alone as proof: a tag can also be absent because its trigger never matched.
 
-## 11. Record the before-and-after demonstration
+## 11. Record the consent demonstration
 
-### Take 1 — show the unrestricted baseline
+### Take 1 — introduce the setup and reset consent
 
-**Do:** open Before. Add twice. Open Bag 2. Confirm **£36.00**, then place the sample order.
-
-**Show:** Shop actions **3**, Tracked actions **3**. The total local receipts should be **6**: three category tags plus three shop events. The thank-you view shows two notebooks and £36. The log has `Tag fired` for additions and purchase tracking.
+**Do:** open the normal site URL and the Behind the banner panel. Withdraw any saved consent, let the page reload, and choose Deny if the banner needs a choice.
 
 **Say:**
 
-> “Before the banner, these demonstration tags run immediately. Two additions and one order gave us three shop actions and three tracked actions.”
+> “This is one normal GTM installation. I will keep the tags in place and change only my consent. First I will decline, then allow Statistics, then withdraw again.”
 
-### Take 2 — reset correctly
-
-**Do:** close the order view. Click **Clear demo cookies** in Before, then select With Cookiebot. Click Withdraw consent if you have a saved grant; wait for the page reload. Open cookie settings and choose Deny if needed.
-
-The two modes share a hostname. Their cookies therefore share storage. **Clear demo cookies is our demonstration cleanup button**, not an automatic Cookiebot cleanup feature. It leaves Cookiebot consent unchanged. Withdrawal is the separate consent reset.
-
-### Take 3 — prove blocking
+### Take 2 — prove blocking
 
 **Do:** with Statistics denied, add twice and place one order.
 
@@ -521,7 +488,7 @@ The two modes share a hostname. Their cookies therefore share storage. **Clear d
 
 > “The customer can still complete an order. We have three shop actions, but zero tracked actions. The purchase exists inside the website; the tracking tag was not allowed to run.”
 
-### Take 4 — grant Statistics on the same page
+### Take 3 — grant Statistics on the same page
 
 **Do:** continue shopping, open cookie settings, enable **Statistics only**, and choose Allow selection. Add one notebook, then place a sample order.
 
@@ -533,7 +500,7 @@ The two modes share a hostname. Their cookies therefore share storage. **Clear d
 
 The current demo does not replay purchases that happened while consent was denied. A different implementation could choose a different event pipeline; don't imply replay is a Cookiebot default.
 
-### Take 5 — withdraw again
+### Take 4 — withdraw again
 
 **Do:** close the order, click Withdraw consent, wait for reload, add once and place a sample order.
 
@@ -558,14 +525,13 @@ This site's withdrawal handler explicitly clears the three demo cookies and relo
 
 ## 12. Publish and retest
 
-Once Preview behaves correctly, use **Submit**, give the container version a descriptive name, review the changes, and publish. Publish the two demo containers separately.
+Once Preview behaves correctly, use **Submit**, give the container version a descriptive name, review the changes, and publish. There is only one container to publish.
 
 Example version names:
 
-- `Before banner — unrestricted demo receipts`
 - `Cookiebot — consent-gated demo receipts`
 
-Then retest the public site outside Preview. Preview can show draft behavior that ordinary visitors do not receive. Check the loaded container ID if a result seems stale. The project's `gtmRevision` value adds a cache-busting revision parameter to the After loader; it does not publish or select a GTM version.
+Then retest the public site outside Preview. Preview can show draft behavior that ordinary visitors do not receive. Check the loaded container ID if a result seems stale.
 
 ## 13. Cookie declaration and scan
 
@@ -599,9 +565,9 @@ Built-in checks can change how supported Google tags behave rather than preventi
 
 > “Not in this isolated demo. GTM really runs or blocks our demonstration tag. That tag reports back to this page, which makes the result visible. A real analytics destination requires its own configuration and delivery verification.”
 
-**Why are there two containers?**
+**Do I need another container for the test?**
 
-> “They're two versions of a controlled experiment. The Before setup intentionally skips consent gating. The After setup includes Cookiebot and consent requirements. A normal installation does not require two containers.”
+> “No. We load one container and use the banner to change consent. The event is the same; the permission changes whether its tracking tag can run.”
 
 **Why does the empty bag say zero after ordering?**
 
@@ -615,7 +581,7 @@ No. The same custom demo shop tag listens for both `add_to_cart` and `purchase`.
 
 Keep this out of the core recording unless you want a longer integration tutorial. It is **not configured or verified in the supplied project**.
 
-Use a separate demo GA4 property and web data stream. Add its Google tag to the After container; for the intended Basic behavior, require `analytics_storage` and trigger it once consent is available. Add explicit GA4 event tags for additions and purchases, including their ecommerce parameters, with the same required Statistics consent. Ensure the Google tag initializes before event tags that depend on it.
+Use a separate demo GA4 property and web data stream. Add its Google tag to the demo container; for the intended Basic behavior, require `analytics_storage` and trigger it once consent is available. Add explicit GA4 event tags for additions and purchases, including their ecommerce parameters, with the same required Statistics consent. Ensure the Google tag initializes before event tags that depend on it.
 
 Verify one page view per intended page, one event per action, correct currency/value/items, unique transaction IDs, denial and same-page consent transitions. Inspect actual requests and the destination's debugging interface; local receipts cannot establish ingestion. Don't reuse the production Kajabi measurement IDs.
 
@@ -629,7 +595,6 @@ For Meta, create an isolated test implementation, use the documented browser/ser
 | No Tag fired badge after Allow | Verify trigger spelling, consent state at the event, actual GTM loading and correct container. |
 | Category fires only after refresh | Confirm cookie_consent_update, Once per event and the successful-execution guard. |
 | Three extra total receipts | Category initialization receipts are separate from the shop counter. |
-| Demo cookies visible when switching modes | Clear the baseline demo cookies before the After take. Both modes use one hostname. |
 | Banner missing | Verify domain registration, ID, geography, saved consent, published container and blocked network resources. |
 | Two banners or duplicate events | Check for duplicate GTM loaders, direct CMP scripts, native platform integrations and repeated tags. |
 | Wrong order total | Count is quantity × £18. New orders reset the bag; the order view keeps the completed total. |
@@ -638,13 +603,21 @@ For Meta, create an isolated test implementation, use the documented browser/ser
 
 ## 17. Screenshots and shot list
 
-These are actual browser captures from the hosted demo, taken 5 September 2026. They illustrate behavior, not a substitute for a fresh Tag Assistant check during recording. The first screenshot shows an existing mixed session, so its **6 / 3** counters differ from the clean scripted **5 / 2** take.
+The configuration screenshots below show the same consent-controlled container used by the current single-container build. Older storefront comparison screenshots have been removed from this walkthrough.
 
-![Desktop storefront and live comparison](screenshots/01-live-comparison.png)
+### Verified on the deployed single-container site
 
-![Order confirmation with consent withdrawn](screenshots/02-order-blocked.png)
+These captures show the same site and the same GTM container. No URL switch is involved.
 
-![Denied consent with shop actions and zero tracked actions](screenshots/03-denied-counters.png)
+![Statistics granted: new shop actions produced two tag receipts and the purchase tag fired](screenshots/single-container/granted.png)
+
+*After the denied order, granting Statistics and placing a new order produced 4 shop actions / 2 tracked actions. The new order total was £18.*
+
+![Consent withdrawn: the next order succeeds but its tracking is blocked](screenshots/single-container/withdrawn.png)
+
+*After withdrawal and reload, another add-to-bag and order produced 2 shop actions / 0 tracked actions. The order still succeeded at £18.*
+
+Live checks on 5 September 2026 also confirmed that the obsolete `?mode=before` URL cannot bypass consent: it loads the same single container and blocks the shop tag while consent is denied. Eight automated tests passed, including quantity totals, distinct order IDs, duplicate-submit prevention and exactly one GTM loader.
 
 The setup instructions now include **five actual Fieldnotes GTM screenshots captured in Arc on 5 September 2026**:
 
@@ -654,7 +627,7 @@ The setup instructions now include **five actual Fieldnotes GTM screenshots capt
 | Section 7C | [Consent-update trigger](screenshots/gtm/04-consent-update-trigger.jpg) | The event that gives category tags an opportunity to run. |
 | Section 7D | [Shop-event trigger](screenshots/gtm/05-shop-event-trigger.jpg) | Exact event names and regex matching. |
 | Section 7E | [Statistics consent check](screenshots/gtm/03-statistics-consent.jpg) | Permission and trigger shown together. |
-| Section 7F | [After tag inventory](screenshots/gtm/01-after-tags.jpg) | Five tags, their types and assigned triggers. |
+| Section 7F | [Tag inventory](screenshots/gtm/01-after-tags.jpg) | Five tags, their types and assigned triggers. |
 
 The **Add to workspace** image in section 7A remains an explicitly labelled official Cookiebot reference. Other vendor examples are retained in the [reference image folder](screenshots/reference/README.md). Configuration screenshots show settings; they do not replace a fresh Tag Assistant execution test. Tag Assistant denied/granted event screenshots and Consent Overview captures are still to be recorded.
 
@@ -680,7 +653,7 @@ Finish the video with:
 Paste each complete snippet into **Custom HTML**. The receipt event names and details intentionally match this site's inspector. Don't rename them without updating the site code.
 
 
-### After container
+### demo container
 
 #### Demo - Statistics receipt
 
@@ -716,45 +689,9 @@ window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Consented shop 
 ```
 
 
-### Before container
-
-#### Before - Statistics receipt
-
-```html
-<script>
-document.cookie="demo_statistics=1; Path=/; SameSite=Lax";window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Statistics demo tag"}));
-</script>
-```
-
-#### Before - Marketing receipt
-
-```html
-<script>
-document.cookie="demo_marketing=1; Path=/; SameSite=Lax";window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Marketing demo tag"}));
-</script>
-```
-
-#### Before - Preferences receipt
-
-```html
-<script>
-document.cookie="demo_preferences=1; Path=/; SameSite=Lax";window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Preferences demo tag"}));
-</script>
-```
-
-#### Before - Unrestricted shop event receipt
-
-```html
-<script>
-window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Consented shop event"}));
-
-</script>
-```
-
-
 ## Source and implementation notes
 
-The exact tag settings and snippets in this guide come from this project’s GTM import files. The storefront implementation lives in `public/app.js` and `public/store.js`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
+The exact tag settings and snippets in this guide come from this project’s GTM import file. The storefront implementation lives in `public/app.js` and `public/store.js`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
 
 The live demo is independent of the production Kajabi site. This repository does not configure Kajabi native integrations, production Analytics, production Meta tracking, or a server container.
 

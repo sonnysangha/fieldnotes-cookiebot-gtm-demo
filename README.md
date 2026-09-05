@@ -2,7 +2,7 @@
 
 A notebook shop that makes cookie consent visible: **shop actions still work, but tracking tags wait for permission.**
 
-[Try the live demo](https://fieldnotes-consent-demo-2026.vercel.app/?mode=after) · **[Sign up for Cookiebot](https://usercentrics.sjv.io/sonnysangha)**
+[Try the live demo](https://fieldnotes-consent-demo-2026.vercel.app/) · **[Sign up for Cookiebot](https://usercentrics.sjv.io/sonnysangha)**
 
 The signup link is Sonny’s affiliate/referral link.
 
@@ -16,9 +16,9 @@ GTM really runs or blocks the demo tags. Orders are simulated, and the tags repo
 | Google Tag Manager | Run a tag only when its event and consent rules allow it. |
 | The shop’s side panel | Show which shop actions produced an actual tag receipt. |
 
-This README takes you through the **quick setup using the included GTM imports**. Follow the steps in order.
+This README takes you through the **quick setup using the included GTM import**. Follow the steps in order.
 
-**Filming the setup?** Use the [recording guide](RECORDING_GUIDE.md#7-build-the-after-container-on-camera) to create the tags manually, with screenshots and ready-to-read explanations. It also explains [direct script vs GTM](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) and [Basic vs Advanced Consent Mode](RECORDING_GUIDE.md#where-google-consent-mode-fits).
+**Filming the setup?** Use the [recording guide](RECORDING_GUIDE.md#7-build-the-container-on-camera) to create the tags manually, with screenshots and ready-to-read explanations. It also explains [direct script vs GTM](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) and [Basic vs Advanced Consent Mode](RECORDING_GUIDE.md#where-google-consent-mode-fits).
 
 ## 1. Copy and deploy the shop
 
@@ -62,9 +62,9 @@ Keep this import out of production containers.
 
 In the **Cookiebot Demo** container, open **Variables → Demo - Cookiebot Domain Group ID**. Replace the placeholder with your Cookiebot ID and save.
 
-The After tag list should look like this:
+The tag list should look like this:
 
-![The five After tags and their triggers](screenshots/gtm/01-after-tags.jpg)
+![The five tags and their triggers](screenshots/gtm/01-after-tags.jpg)
 
 **Why this works:** Cookiebot runs first on Consent Initialization. The optional demo tags have consent requirements. For example, the shop receipt tag matches `add_to_cart` or `purchase`, but it can only run when `analytics_storage` is granted.
 
@@ -74,21 +74,19 @@ Edit [`public/config.js`](https://github.com/sonnysangha/fieldnotes-cookiebot-gt
 
 ```javascript
 window.DEMO_CONFIG = {
-  baselineGtmId: '',
-  gtmId: 'GTM-YOUR-AFTER-ID',
-  gtmRevision: '1',
+  gtmId: 'GTM-YOURID',
   cookiebotId: 'YOUR-COOKIEBOT-DOMAIN-GROUP-ID',
   allowedHosts: ['localhost', '127.0.0.1', 'your-site.vercel.app']
 };
 ```
 
-Leave `baselineGtmId` empty; it is only for the optional Before comparison. Replace the other placeholders with your actual IDs and hostname. Use the same Cookiebot ID as step 4. The hostname has no `https://` or path.
+Replace the other placeholders with your actual IDs and hostname. Use the same Cookiebot ID as step 4. The hostname has no `https://` or path.
 
-Redeploy the site and use **With Cookiebot** (`?mode=after`) throughout this walkthrough. Its loader already installs the selected GTM container, so **don’t add another GTM snippet**.
+Redeploy the site and open its normal URL throughout this walkthrough. Its loader already installs the selected GTM container, so **don’t add another GTM snippet**.
 
 ## 6. Test before publishing
 
-In the After container, click **Preview** and connect to your deployed URL with `?mode=after`.
+In the container, click **Preview** and connect to your deployed URL without any special mode parameter.
 
 Open the site’s **Behind the banner** panel. Start with no saved grant; use **Withdraw consent** if needed and let the page reload.
 
@@ -110,16 +108,6 @@ Once Preview passes, **Submit → Publish** the container. Give the version a cl
 
 That’s the core demonstration: shopping continues to work, while consent determines whether tracking tags run.
 
-<details>
-<summary>Optional: show the site before a banner was installed</summary>
-
-The hosted reference also has a separate **Before** container for an unrestricted comparison. Only one container loads per page. This extra container is a filming convenience, not a normal installation requirement.
-
-To reproduce it, create a second empty Web container, import [demo-before-banner.import.json](gtm/demo-before-banner.import.json), enter its ID in `baselineGtmId`, redeploy, preview and publish. See the [Before setup](RECORDING_GUIDE.md#8-build-the-before-container).
-
-For that take, select Before, add twice and order: expect 3 shop actions / 3 tracked actions and £36. Click Clear demo cookies before switching back to With Cookiebot, then withdraw any saved consent before the denied take.
-
-</details>
 
 ## Finish the Cookiebot setup
 
@@ -134,7 +122,6 @@ For real Google Analytics or Meta tracking, you must add and verify those destin
 | No banner | Correct hostname and Cookiebot ID; banner applies to your location. |
 | No GTM connection | Your `gtmId`, Cookiebot ID and `allowedHosts` in `public/config.js`; redeploy after edits. |
 | Works only in Preview | Publish the container and retest outside Preview. |
-| Cookies remain after Before | Use Clear demo cookies before the After take. |
 | Purchase appears after denying | Internal shop events are expected. Check whether the tracking tag fired. |
 
-**More detail:** [manual setup and screenshots](RECORDING_GUIDE.md#7-build-the-after-container-on-camera) · [recording script](RECORDING_GUIDE.md#11-record-the-before-and-after-demonstration) · [installation choices](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) · [tag code](RECORDING_GUIDE.md#18-copy-and-paste-tag-code)
+**More detail:** [manual setup and screenshots](RECORDING_GUIDE.md#7-build-the-container-on-camera) · [recording script](RECORDING_GUIDE.md#11-record-the-consent-demonstration) · [installation choices](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) · [tag code](RECORDING_GUIDE.md#18-copy-and-paste-tag-code)
