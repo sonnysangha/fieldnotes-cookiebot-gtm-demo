@@ -217,6 +217,10 @@ These steps reproduce the project's supplied container configuration. UI labels 
 6. Choose **Constant** as the variable type.
 7. Enter the Domain Group ID from your Cookiebot account and save.
 
+![Cookiebot template Add to workspace button](screenshots/reference/04-template-gallery.png)
+
+*Official Cookiebot reference screenshot — Use Add to workspace after selecting the official template. [Source: Cookiebot GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment). These examples are not captures of the Fieldnotes container.*
+
 ### B. Create the CMP tag
 
 1. **Tags → New**.
@@ -229,6 +233,14 @@ These steps reproduce the project's supplied container configuration. UI labels 
 8. Trigger: **Consent Initialization – All Pages**.
 9. Additional consent: **No additional consent required** for the CMP itself.
 10. Save.
+
+![Cookiebot CMP tag configuration with example ID](screenshots/reference/05-cookiebot-tag.png)
+
+*Official Cookiebot reference screenshot — The illustrated ID is a placeholder; select your Domain Group ID constant. This older template screenshot does not show all current consent fields, so follow the numbered settings above. [Source: Cookiebot GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment). These examples are not captures of the Fieldnotes container.*
+
+![Consent Initialization All Pages firing trigger](screenshots/reference/06-consent-initialization.png)
+
+*Official Cookiebot reference screenshot — Select this trigger for the CMP banner tag. [Source: Cookiebot GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment). These examples are not captures of the Fieldnotes container.*
 
 The CMP must be able to load before a visitor has granted optional consent. Do not require `analytics_storage` for the banner itself.
 
@@ -245,6 +257,10 @@ The CMP must be able to load before a visitor has granted optional consent. Do n
 5. Leave regular-expression matching off.
 6. Choose **All Custom Events** for this named event.
 7. Save.
+
+![Custom Event trigger for cookie_consent_update with regex disabled](screenshots/reference/07-consent-update-trigger.png)
+
+*Official Cookiebot reference screenshot — Enter the exact event name, leave regex off and select All Custom Events. [Source: Cookiebot GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment). These examples are not captures of the Fieldnotes container.*
 
 This is the trigger for the category initialization tags. An All Pages trigger alone would not give them another opportunity when someone first grants consent later on that same page.
 
@@ -272,6 +288,10 @@ Then open **Advanced Settings → Consent Settings → Require additional consen
 | `Demo - Marketing receipt` | Cookiebot - Consent Update | `ad_storage` |
 | `Demo - Preferences receipt` | Cookiebot - Consent Update | `functionality_storage` |
 | `Demo - Consented shop event receipt` | Demo - Shop Events | `analytics_storage` |
+
+![Require additional consent for tag to fire with ad_storage](screenshots/reference/08-additional-consent.png)
+
+*Official Cookiebot reference screenshot — This is the Marketing example using ad_storage. For Statistics and the shop-event tag, enter analytics_storage; for Preferences, enter functionality_storage. Use the table above. [Source: Cookiebot GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment). These examples are not captures of the Fieldnotes container.*
 
 The three category scripts contain a per-page guard. That guard is set only after the tag is permitted to execute. Repeated consent updates can retry a previously blocked category without executing a successful category twice. Keep **Once per event**; using once-per-page caused a failed retry in this particular demo's earlier testing.
 
@@ -504,7 +524,9 @@ These are actual browser captures from the hosted demo, taken 5 September 2026. 
 
 ![Denied consent with shop actions and zero tracked actions](screenshots/03-denied-counters.png)
 
-GTM admin screenshots are not included as newly verified captures. Capture these during your manual setup take:
+Five **official Cookiebot GTM reference screenshots** are embedded beside the instructions in **sections 7A, 7B, 7C and 7E**. They illustrate the template button, CMP ID field, Consent Initialization trigger, consent-update trigger and additional consent settings. Their captions identify differences from this demo. Image provenance is listed in [the reference image credits](screenshots/reference/README.md).
+
+**Actual Fieldnotes GTM configuration and Tag Assistant captures are still pending:** Arc displayed a blank GTM page during capture. These reference images do not prove the live container configuration or firing behavior. Capture the following during your manual setup take:
 
 1. Empty demo container name and ID.
 2. Official Cookiebot template selection.
