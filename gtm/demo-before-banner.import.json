@@ -1,0 +1,130 @@
+{
+  "exportFormatVersion": 2,
+  "containerVersion": {
+    "tag": [
+      {
+        "tagId": "10",
+        "name": "Before - Statistics receipt",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>document.cookie=\"demo_statistics=1; Path=/; SameSite=Lax\";window.dispatchEvent(new CustomEvent(\"demo-tag-fired\", {detail: \"Statistics demo tag\"}));</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_LOAD",
+        "consentSettings": {
+          "consentStatus": "NOT_NEEDED"
+        }
+      },
+      {
+        "tagId": "11",
+        "name": "Before - Marketing receipt",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>document.cookie=\"demo_marketing=1; Path=/; SameSite=Lax\";window.dispatchEvent(new CustomEvent(\"demo-tag-fired\", {detail: \"Marketing demo tag\"}));</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_LOAD",
+        "consentSettings": {
+          "consentStatus": "NOT_NEEDED"
+        }
+      },
+      {
+        "tagId": "12",
+        "name": "Before - Preferences receipt",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>document.cookie=\"demo_preferences=1; Path=/; SameSite=Lax\";window.dispatchEvent(new CustomEvent(\"demo-tag-fired\", {detail: \"Preferences demo tag\"}));</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_LOAD",
+        "consentSettings": {
+          "consentStatus": "NOT_NEEDED"
+        }
+      },
+      {
+        "tagId": "13",
+        "name": "Before - Unrestricted shop event receipt",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>window.dispatchEvent(new CustomEvent(\"demo-tag-fired\", {detail: \"Consented shop event\"}));</script>"
+          }
+        ],
+        "firingTriggerId": [
+          "3"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "consentSettings": {
+          "consentStatus": "NOT_NEEDED"
+        }
+      }
+    ],
+    "trigger": [
+      {
+        "triggerId": "3",
+        "name": "Demo - Shop Events",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "MATCH_REGEX",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "^(add_to_cart|purchase)$"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "variable": [],
+    "builtInVariable": [
+      {
+        "name": "Event",
+        "type": "EVENT"
+      }
+    ],
+    "customTemplate": []
+  }
+}
