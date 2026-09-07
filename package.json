@@ -1,1 +1,26 @@
-{"name":"cookiebot-consent-demo","private":true,"type":"module","scripts":{"dev":"node scripts/serve.mjs","build":"node scripts/build.mjs","test":"node --test scripts/*.test.mjs"}}
+{
+  "name": "cookiebot-consent-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^30.0.1",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": "^22.22.2 || >=24.15.0"
+  }
+}

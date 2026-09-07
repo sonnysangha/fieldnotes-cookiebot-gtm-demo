@@ -234,9 +234,10 @@ git clone https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo.git
 cd fieldnotes-cookiebot-gtm-demo
 ```
 
-Use a current Node.js LTS release. This is a static HTML/CSS/JavaScript project with no npm package dependencies.
+Use Node.js 24.15+ (or Node.js 22.22.2+). This is a React + Vite app. Install dependencies before running it.
 
 ```bash
+npm install
 npm run dev
 ```
 
@@ -265,7 +266,7 @@ Replace every placeholder. The hostname has no protocol, path or trailing slash.
 
 The **GTM Cookiebot constant and `cookiebotId` here must match**. The GTM value controls the CMP; the site value also identifies the declaration.
 
-**Do not paste a second GTM snippet into this project.** Its `app.js` already loads the selected container and initializes `dataLayer`. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
+**Do not paste a second GTM snippet into this project.** Its `src/lib/demo-store.js` already loads the selected container and initializes `dataLayer`. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
 
 This demo requires JavaScript and does not implement a noscript tracking path. It includes no server checkout, payment form, analytics destination or Meta pixel.
 
@@ -603,6 +604,8 @@ For Meta, create an isolated test implementation, use the documented browser/ser
 
 ## 17. Screenshots and shot list
 
+The app was migrated to React + Vite on 7 September 2026. The same container and recording flow were verified live again: denied 2/0, Statistics granted 4/2, and withdrawn 2/0 shop/tracked actions. Nine React/lifecycle tests and the production build passed. The screenshots below predate this code migration; the storefront design and GTM settings are retained.
+
 The configuration screenshots below show the same consent-controlled container used by the current single-container build. Older storefront comparison screenshots have been removed from this walkthrough.
 
 ### Verified on the deployed single-container site
@@ -691,7 +694,7 @@ window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Consented shop 
 
 ## Source and implementation notes
 
-The exact tag settings and snippets in this guide come from this project’s GTM import file. The storefront implementation lives in `public/app.js` and `public/store.js`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
+The exact tag settings and snippets in this guide come from this project’s GTM import file. The storefront implementation lives in `src/lib/demo-store.js` and the React components in `src/components/`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
 
 The live demo is independent of the production Kajabi site. This repository does not configure Kajabi native integrations, production Analytics, production Meta tracking, or a server container.
 

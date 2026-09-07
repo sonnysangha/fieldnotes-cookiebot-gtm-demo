@@ -1,6 +1,6 @@
 # Fieldnotes — Cookiebot + GTM demo
 
-A notebook shop that makes cookie consent visible: **shop actions still work, but tracking tags wait for permission.**
+A React + Vite notebook shop that makes cookie consent visible: **shop actions still work, but tracking tags wait for permission.**
 
 [Try the live demo](https://fieldnotes-consent-demo-2026.vercel.app/) · **[Sign up for Cookiebot](https://usercentrics.sjv.io/sonnysangha)**
 
@@ -22,15 +22,16 @@ This README takes you through the **quick setup using the included GTM import**.
 
 ## 1. Copy and deploy the shop
 
-You need Git, a current Node.js LTS release, and accounts for Cookiebot, GTM and a static website host.
+You need Git, Node.js 24.15+ (or Node.js 22.22.2+), and accounts for Cookiebot, GTM and a static website host.
 
 ```bash
 git clone https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo.git
 cd fieldnotes-cookiebot-gtm-demo
+npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173/`. There are no npm dependencies to install. The shop works, but tracking stays disconnected until you add your IDs below.
+Open `http://127.0.0.1:4173/`. The app uses React and Vite. The shop works, but tracking stays disconnected until you add your IDs below.
 
 Deploy your copy to get a public hostname. With Vercel, import the repository and use its included configuration: build command `npm run build`, output directory `dist`.
 
@@ -125,3 +126,17 @@ For real Google Analytics or Meta tracking, you must add and verify those destin
 | Purchase appears after denying | Internal shop events are expected. Check whether the tracking tag fired. |
 
 **More detail:** [manual setup and screenshots](RECORDING_GUIDE.md#7-build-the-container-on-camera) · [recording script](RECORDING_GUIDE.md#11-record-the-consent-demonstration) · [installation choices](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) · [tag code](RECORDING_GUIDE.md#18-copy-and-paste-tag-code)
+
+## React project structure
+
+- `src/App.jsx` — application state, panels and dialogs.
+- `src/components/` — storefront, bag, inspector and cookie declaration.
+- `src/lib/demo-store.js` — cart events, Cookiebot listeners and the single GTM loader. React subscribes with `useSyncExternalStore`.
+- `public/config.js` — your GTM ID, Cookiebot ID and allowed hostnames.
+- `gtm/demo-basic-consent.import.json` — the same five-tag container import.
+
+`npm test` runs the React interaction and consent lifecycle tests. `npm run build` creates the Vite production bundle in `dist`; `npm run preview` serves that build locally.
+
+React Strict Mode is enabled. Listener cleanup and an idempotent GTM loader prevent development remounts from installing duplicate containers. The test fixture simulates tag receipts for local tests; use the real GTM Preview and consent walkthrough above to verify the deployed integration.
+
+Verified after the React migration on 7 September 2026: nine automated tests and the production build passed. Live denied → Statistics granted → withdrawn tests returned 2/0, 4/2 and 2/0 shop/tracked actions, with one GTM script and correct £18 order confirmations.
