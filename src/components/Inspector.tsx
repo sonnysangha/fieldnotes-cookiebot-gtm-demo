@@ -1,36 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import type { DemoState, ConsentState } from "../domain/types";
+import { useState } from "react";
 
-function Counter({ id, value }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (
-      !value ||
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    const animation = ref.current?.animate?.(
-      [
-        { transform: "scale(1)", backgroundColor: "#d7ddc6" },
-        { transform: "scale(1.16)", backgroundColor: "#d7ddc6" },
-        { transform: "scale(1)", backgroundColor: "transparent" },
-      ],
-      { duration: 550 },
-    );
-    return () => animation?.cancel();
-  }, [value]);
+function Counter({ id, value }: { id: string; value: number }) {
   return (
-    <strong ref={ref} id={id}>
+    <strong
+      id={id}
+      key={value}
+      className={value ? "counter-change" : undefined}
+    >
       {value}
     </strong>
   );
 }
 export default function Inspector({
   state,
-  store,
+  onClearCookies,
+  onClearLog,
+  getDiagnostics,
   open,
   onClose,
   onSettings,
   onWithdraw,
+}: {
+  state: DemoState;
+  onClearCookies: () => void;
+  onClearLog: () => void;
+  getDiagnostics: () => string;
+  open: boolean;
+  onClose: () => void;
+  onSettings: () => void;
+  onWithdraw: () => void;
 }) {
   const [diagnostics, setDiagnostics] = useState("");
   const { consent, actions, tracked, receipts, events, cookies } = state;
@@ -131,23 +130,28 @@ export default function Inspector({
           {state.connection}
         </div>
         <div className="states">
-          {["necessary", "preferences", "statistics", "marketing"].map(
-            (key) => (
-              <div key={key}>
-                <span>{key[0].toUpperCase() + key.slice(1)}</span>
-                <strong id={key} data-value={String(consent?.[key])}>
-                  {!consent ? "Unknown" : consent[key] ? "Allowed" : "Denied"}
-                </strong>
-              </div>
-            ),
-          )}
+          {(
+            [
+              "necessary",
+              "preferences",
+              "statistics",
+              "marketing",
+            ] as (keyof ConsentState)[]
+          ).map((key) => (
+            <div key={key}>
+              <span>{key[0].toUpperCase() + key.slice(1)}</span>
+              <strong id={key} data-value={String(consent?.[key])}>
+                {!consent ? "Unknown" : consent[key] ? "Allowed" : "Denied"}
+              </strong>
+            </div>
+          ))}
         </div>
         <div className="cookie-readout">
           <h3>Demo cookies on this page</h3>
           <p id="demo-cookies">
             {cookies.length ? cookies.join(" · ") : "None detected."}
           </p>
-          <button id="clear-demo-cookies" onClick={store.clearCookies}>
+          <button id="clear-demo-cookies" onClick={onClearCookies}>
             Clear demo cookies
           </button>
           <p className="fine">
@@ -157,7 +161,7 @@ export default function Inspector({
         </div>
         <div className="log-title">
           <h3>Detailed event log</h3>
-          <button id="clear" onClick={store.clearLog}>
+          <button id="clear" onClick={onClearLog}>
             Clear log
           </button>
         </div>
@@ -194,7 +198,7 @@ export default function Inspector({
           <summary>Technical diagnostics</summary>
           <button
             id="refresh-diagnostics"
-            onClick={() => setDiagnostics(store.diagnostics())}
+            onClick={() => setDiagnostics(getDiagnostics())}
           >
             Refresh diagnostics
           </button>

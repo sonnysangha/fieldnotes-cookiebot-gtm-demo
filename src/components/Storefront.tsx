@@ -1,13 +1,14 @@
-export default function Storefront({
-  state,
-  store,
-  onBag,
-  onSettings,
-  onDeclaration,
-  onArticle,
-  onInspector,
-  inspectorOpen,
-}) {
+import Image from "next/image";
+import {
+  BagButton,
+  AddToBag,
+  ArticleButton,
+  ConsentLinks,
+  InspectorButton,
+} from "./ShopControls";
+
+// Server Component: static storefront content stays outside the client bundle.
+export default function Storefront() {
   return (
     <div id="storefront">
       <div className="announcement">
@@ -15,7 +16,7 @@ export default function Storefront({
         <span>Meet your next favourite notebook.</span>
       </div>
       <header className="site-header">
-        <a className="wordmark" href="#" aria-label="Fieldnotes home">
+        <a className="wordmark" href="#storefront" aria-label="Fieldnotes home">
           fieldnotes<span>®</span>
         </a>
         <nav aria-label="Main navigation">
@@ -23,12 +24,7 @@ export default function Storefront({
           <a href="#story">Our approach</a>
           <a href="#journal">The journal</a>
         </nav>
-        <button className="bag-button" id="open-bag" onClick={onBag}>
-          Bag <span id="bag-count">{state.quantity}</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 7h14l1 14H4L5 7Zm4 0V5a3 3 0 0 1 6 0v2" />
-          </svg>
-        </button>
+        <BagButton />
       </header>
       <main>
         <section className="hero">
@@ -52,12 +48,13 @@ export default function Storefront({
             </div>
           </div>
           <figure className="hero-image">
-            <img
+            <Image
               src="/images/studio-notebooks.png"
               alt="Cloth notebooks in sage, terracotta and forest green beside an open notebook and pencil in afternoon sunlight"
-              width="1536"
-              height="1024"
-              fetchPriority="high"
+              width={1536}
+              height={1024}
+              preload
+              sizes="(max-width: 799px) 100vw, 50vw"
             />
             <figcaption>PAPER. POSSIBILITIES. EVERY DAY.</figcaption>
           </figure>
@@ -121,14 +118,7 @@ export default function Storefront({
                 <span className="swatch"></span> Sage{" "}
                 <span className="colour-note">Our original colour</span>
               </div>
-              <button className="button dark" id="add" onClick={store.add}>
-                Add to bag <span>+</span>
-              </button>
-              <p className="product-note" id="added-notice" role="status">
-                {state.quantity
-                  ? "Added to your bag. A little possibility, ready to go."
-                  : "A considered little addition to your everyday."}
-              </p>
+              <AddToBag />
               <details open>
                 <summary>
                   The details <span>+</span>
@@ -198,10 +188,7 @@ export default function Storefront({
             </span>
           </div>
           <div className="journal-grid">
-            <button
-              className="journal-card"
-              onClick={() => onArticle("morning")}
-            >
+            <ArticleButton className="journal-card" article="morning">
               <div className="journal-art morning">
                 <div className="drawn-page">
                   <span>today,</span>
@@ -217,8 +204,8 @@ export default function Storefront({
                 <br />
                 and a fresh start. <span>↗</span>
               </h3>
-            </button>
-            <button className="journal-card" onClick={() => onArticle("ideas")}>
+            </ArticleButton>
+            <ArticleButton className="journal-card" article="ideas">
               <div className="journal-art ideas">
                 <div className="idea-paper">
                   What if
@@ -237,7 +224,7 @@ export default function Storefront({
                 <br />
                 Just a place to put it. <span>↗</span>
               </h3>
-            </button>
+            </ArticleButton>
           </div>
         </section>
         <section className="closing">
@@ -255,7 +242,7 @@ export default function Storefront({
       <footer>
         <div className="footer-top">
           <div>
-            <a className="wordmark" href="#">
+            <a className="wordmark" href="#storefront">
               fieldnotes<span>®</span>
             </a>
             <p>
@@ -272,36 +259,16 @@ export default function Storefront({
           </div>
           <div>
             <h3>The small print</h3>
-            <button
-              id="settings"
-              disabled={!state.consent}
-              onClick={onSettings}
-            >
-              Cookie settings ↗
-            </button>
-            <button
-              id="declaration-toggle"
-              disabled={!store.valid}
-              onClick={onDeclaration}
-            >
-              Cookie declaration ↗
-            </button>
-            <button id="about-demo" onClick={() => onArticle("about")}>
+            <ConsentLinks />
+            <ArticleButton id="about-demo" article="about">
               About this shop
-            </button>
+            </ArticleButton>
           </div>
         </div>
         <div className="footer-bottom">
           <span>© 2026 Fieldnotes Studio</span>
           <span>A sample storefront by PAPAFAM. No real purchases.</span>
-          <button
-            id="open-demo"
-            onClick={onInspector}
-            aria-controls="demo-dialog"
-            aria-expanded={inspectorOpen}
-          >
-            Demo controls ↗
-          </button>
+          <InspectorButton />
         </div>
       </footer>
     </div>

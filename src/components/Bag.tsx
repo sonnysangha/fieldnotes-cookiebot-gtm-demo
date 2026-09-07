@@ -1,13 +1,26 @@
+import type { DemoState } from "../domain/types";
 import { useEffect, useRef } from "react";
 import Dialog from "./Dialog";
-import { money } from "../lib/demo-store";
+import { money } from "../domain/shop";
 
-export default function Bag({ state, store, open, onClose }) {
+export default function Bag({
+  state,
+  onRemove,
+  onPurchase,
+  open,
+  onClose,
+}: {
+  state: DemoState;
+  onRemove: () => void;
+  onPurchase: () => void;
+  open: boolean;
+  onClose: () => void;
+}) {
   const { quantity, order, consent } = state;
-  const thanks = useRef(null);
+  const thanks = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (order && open) thanks.current?.focus();
-  }, [order?.id, open]);
+  }, [order, open]);
   return (
     <Dialog
       id="bag-dialog"
@@ -44,9 +57,11 @@ export default function Bag({ state, store, open, onClose }) {
           <p id="order-tracking" className="notice" role="status">
             {order.tracked
               ? "✓ Purchase tracking tag fired."
-              : consent?.statistics
-                ? "Order complete. Waiting for a tracking receipt."
-                : "Order complete. Purchase tracking is blocked by your consent choice."}
+              : !consent
+                ? "Order complete. Tracking status is unavailable until Cookiebot connects."
+                : consent.statistics
+                  ? "Order complete. Waiting for a tracking receipt."
+                  : "Order complete. Purchase tracking is blocked by your consent choice."}
           </p>
           <p className="fine">
             This was a demonstration. No payment was taken and no product will
@@ -72,7 +87,7 @@ export default function Bag({ state, store, open, onClose }) {
                 className="remove-item"
                 id="remove-item"
                 disabled={!quantity}
-                onClick={store.remove}
+                onClick={onRemove}
               >
                 Remove one
               </button>
@@ -86,7 +101,7 @@ export default function Bag({ state, store, open, onClose }) {
               className="button dark"
               id="purchase"
               disabled={!quantity}
-              onClick={store.purchase}
+              onClick={onPurchase}
             >
               Place demo order <span>→</span>
             </button>

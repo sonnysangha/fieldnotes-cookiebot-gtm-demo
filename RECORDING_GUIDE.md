@@ -234,7 +234,7 @@ git clone https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo.git
 cd fieldnotes-cookiebot-gtm-demo
 ```
 
-Use Node.js 24.15+ (or Node.js 22.22.2+). This is a React + Vite app. Install dependencies before running it.
+Use Node.js 24.15+. This is a Next.js 16 + TypeScript app. Install dependencies before running it.
 
 ```bash
 npm install
@@ -248,25 +248,21 @@ npm test
 npm run build
 ```
 
-The static build appears in `dist/`. Deploy that directory to your preferred static host. The live reference uses Vercel.
+The Next.js build appears in `.next/`. Use `npm start` to serve the production build locally, or deploy the repository with the Next.js preset on Vercel.
 
-For Vercel: import your copy of this repository, select the repository root, use the included `vercel.json` settings (build `npm run build`, output `dist`), then deploy. Add the assigned hostname to both Cookiebot and `allowedHosts`, fill in your IDs, and redeploy. No environment secrets are required by this demo. Changing only GTM tags requires a GTM publish; changing site configuration or the storefront requires a site redeploy.
+For Vercel: import your repository and select the Next.js preset. Add your hostname in Cookiebot and supply the three environment variables below in Project Settings → Environment Variables. Then redeploy. GTM tag changes require a GTM publish; app or environment changes require a site rebuild and redeploy.
 
-Edit **`public/config.js`**:
+Copy `.env.example` to `.env.local` for local development:
 
-```javascript
-window.DEMO_CONFIG = {
-  gtmId: 'GTM-YOURID',
-  cookiebotId: 'YOUR-COOKIEBOT-DOMAIN-GROUP-ID',
-  allowedHosts: ['localhost', '127.0.0.1', 'your-demo.example.com']
-};
+```dotenv
+NEXT_PUBLIC_GTM_ID=GTM-YOURID
+NEXT_PUBLIC_COOKIEBOT_ID=YOUR-COOKIEBOT-DOMAIN-GROUP-ID
+NEXT_PUBLIC_ALLOWED_HOSTS=localhost,127.0.0.1,your-demo-domain.vercel.app
 ```
 
-Replace every placeholder. The hostname has no protocol, path or trailing slash. Missing/invalid IDs or an unapproved hostname prevent the loader from adding external scripts. The public source intentionally ships without our live account configuration.
+The values are public browser identifiers, not secrets. Keep real credentials out of `NEXT_PUBLIC_` variables. Restart the dev server after edits.
 
-The **GTM Cookiebot constant and `cookiebotId` here must match**. The GTM value controls the CMP; the site value also identifies the declaration.
-
-**Do not paste a second GTM snippet into this project.** Its `src/lib/demo-store.js` already loads the selected container and initializes `dataLayer`. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
+**Do not paste a second GTM snippet into this project.** `src/App.tsx` loads it once with `next/script` (`afterInteractive`), after the adapter initializes `dataLayer` and subscribes to Cookiebot events. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
 
 This demo requires JavaScript and does not implement a noscript tracking path. It includes no server checkout, payment form, analytics destination or Meta pixel.
 
@@ -303,7 +299,7 @@ Reference: [Cookiebot's GTM deployment guide](https://support.cookiebot.com/hc/e
 
 If you already have a demo account, reuse it. Otherwise use **Create Account**, enter your demo account details and complete Google's account setup.
 
-Create one **Web** container named `Fieldnotes - Cookiebot Demo` for the core tutorial. Copy its `GTM-…` ID into `gtmId` in `public/config.js` and open the normal site URL. Rebuild and redeploy after changing configuration.
+Create one **Web** container named `Fieldnotes - Cookiebot Demo` for the core tutorial. Copy its `GTM-…` ID into `NEXT_PUBLIC_GTM_ID` and open the normal site URL. Rebuild and redeploy after changing configuration.
 
 
 In the demo container, enable **Admin → Container Settings → Additional Settings → Enable consent overview → Save**. The overview is accessible from the Tags screen. [Google's consent-settings reference](https://support.google.com/tagmanager/answer/10718549).
@@ -444,7 +440,7 @@ In an **empty rehearsal container**:
 6. Complete the import.
 7. Set the imported Cookiebot ID constant to your real Domain Group ID.
 8. Verify the official template, consent settings and triggers before Preview.
-9. Set your public container IDs in `public/config.js` and deploy the site.
+9. Set the three public environment variables from step 5 and deploy the site.
 
 The public import files contain a placeholder Cookiebot ID and omit our account/container metadata. Importing does not publish a container. Do not import these files into your business's production container.
 
@@ -604,7 +600,7 @@ For Meta, create an isolated test implementation, use the documented browser/ser
 
 ## 17. Screenshots and shot list
 
-The app was migrated to React + Vite on 7 September 2026. The same container and recording flow were verified live again: denied 2/0, Statistics granted 4/2, and withdrawn 2/0 shop/tracked actions. Nine React/lifecycle tests and the production build passed. The screenshots below predate this code migration; the storefront design and GTM settings are retained.
+The app now uses Next.js 16 with strict TypeScript, a server-rendered storefront and a single `next/script` GTM loader. The screenshots below show the same retained storefront and GTM settings; they may predate the framework migration. Follow the test matrix to verify your own deployment.
 
 The configuration screenshots below show the same consent-controlled container used by the current single-container build. Older storefront comparison screenshots have been removed from this walkthrough.
 
@@ -694,7 +690,7 @@ window.dispatchEvent(new CustomEvent("demo-tag-fired", {detail: "Consented shop 
 
 ## Source and implementation notes
 
-The exact tag settings and snippets in this guide come from this project’s GTM import file. The storefront implementation lives in `src/lib/demo-store.js` and the React components in `src/components/`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
+The exact tag settings and snippets in this guide come from this project’s GTM import file. The external SDK integration lives in `src/integrations/consent-client.ts`. React state and user actions live in `src/hooks/useDemo.ts`, pure cart transitions in `src/domain/`, and the UI in `src/components/`. Tests cover isolated configuration, distinct order IDs, quantity totals, empty-bag repeat prevention, consent-retry guards and receipt-driven counters. Current documentation links were checked on 5 September 2026. Recheck vendor screens before filming later.
 
 The live demo is independent of the production Kajabi site. This repository does not configure Kajabi native integrations, production Analytics, production Meta tracking, or a server container.
 

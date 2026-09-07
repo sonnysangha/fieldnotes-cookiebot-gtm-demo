@@ -1,6 +1,6 @@
 # Fieldnotes — Cookiebot + GTM demo
 
-A React + Vite notebook shop that makes cookie consent visible: **shop actions still work, but tracking tags wait for permission.**
+A Next.js 16 + TypeScript notebook shop that makes cookie consent visible: **shop actions still work, but tracking tags wait for permission.**
 
 [Try the live demo](https://fieldnotes-consent-demo-2026.vercel.app/) · **[Sign up for Cookiebot](https://usercentrics.sjv.io/sonnysangha)**
 
@@ -20,9 +20,15 @@ This README takes you through the **quick setup using the included GTM import**.
 
 **Filming the setup?** Use the [recording guide](RECORDING_GUIDE.md#7-build-the-container-on-camera) to create the tags manually, with screenshots and ready-to-read explanations. It also explains [direct script vs GTM](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) and [Basic vs Advanced Consent Mode](RECORDING_GUIDE.md#where-google-consent-mode-fits).
 
+### Which Cookiebot instructions does this use?
+
+**Cookiebot → Implementation → CMP Banner → Google Tag Manager** is the installation route for this project. Follow the [official GTM deployment guide](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment).
+
+The official Cookiebot CMP template loads the banner and sets Consent Mode defaults and updates. This project does **not** also embed the direct auto-blocking snippet or the GCM tab’s inline default script. The GTM consent requirements below control the demo tags; the banner alone does not automatically block every arbitrary script in a React app.
+
 ## 1. Copy and deploy the shop
 
-You need Git, Node.js 24.15+ (or Node.js 22.22.2+), and accounts for Cookiebot, GTM and a static website host.
+You need Git, Node.js 24.15+, and accounts for Cookiebot, GTM and a Next.js website host.
 
 ```bash
 git clone https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo.git
@@ -31,9 +37,9 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173/`. The app uses React and Vite. The shop works, but tracking stays disconnected until you add your IDs below.
+Open `http://127.0.0.1:4173/`. The app uses the Next.js App Router. The shop works, but tracking stays disconnected until you add your IDs below.
 
-Deploy your copy to get a public hostname. With Vercel, import the repository and use its included configuration: build command `npm run build`, output directory `dist`.
+Deploy your copy to get a public hostname. With Vercel, import the repository and use its included configuration: the Next.js framework preset and build command `npm run build`.
 
 **Keep the deployed URL handy.** Use a demo domain, separate from your business website.
 
@@ -71,19 +77,17 @@ The tag list should look like this:
 
 ## 5. Connect the shop to your IDs
 
-Edit [`public/config.js`](https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo/blob/main/public/config.js):
+Copy `.env.example` to `.env.local` and fill in your public identifiers:
 
-```javascript
-window.DEMO_CONFIG = {
-  gtmId: 'GTM-YOURID',
-  cookiebotId: 'YOUR-COOKIEBOT-DOMAIN-GROUP-ID',
-  allowedHosts: ['localhost', '127.0.0.1', 'your-site.vercel.app']
-};
+```dotenv
+NEXT_PUBLIC_GTM_ID=GTM-YOURID
+NEXT_PUBLIC_COOKIEBOT_ID=YOUR-COOKIEBOT-DOMAIN-GROUP-ID
+NEXT_PUBLIC_ALLOWED_HOSTS=localhost,127.0.0.1,your-site.vercel.app
 ```
 
-Replace the other placeholders with your actual IDs and hostname. Use the same Cookiebot ID as step 4. The hostname has no `https://` or path.
+Use the same Cookiebot ID as step 4. Hostnames have no `https://` or path. Add these same variables in **Vercel → Project Settings → Environment Variables**, then redeploy. Restart `npm run dev` after changing `.env.local`.
 
-Redeploy the site and open its normal URL throughout this walkthrough. Its loader already installs the selected GTM container, so **don’t add another GTM snippet**.
+The app renders **one `next/script` component with `strategy="afterInteractive"`** after validating the hostname and preparing `dataLayer`. Cookiebot loads from the official CMP tag inside GTM. **Do not paste another GTM or Cookiebot banner script into the app.**
 
 ## 6. Test before publishing
 
@@ -121,22 +125,28 @@ For real Google Analytics or Meta tracking, you must add and verify those destin
 | Problem | First check |
 |---|---|
 | No banner | Correct hostname and Cookiebot ID; banner applies to your location. |
-| No GTM connection | Your `gtmId`, Cookiebot ID and `allowedHosts` in `public/config.js`; redeploy after edits. |
+| No GTM connection | The three `NEXT_PUBLIC_…` environment variables above; redeploy after edits. |
 | Works only in Preview | Publish the container and retest outside Preview. |
 | Purchase appears after denying | Internal shop events are expected. Check whether the tracking tag fired. |
 
 **More detail:** [manual setup and screenshots](RECORDING_GUIDE.md#7-build-the-container-on-camera) · [recording script](RECORDING_GUIDE.md#11-record-the-consent-demonstration) · [installation choices](RECORDING_GUIDE.md#choose-the-installation-before-opening-gtm) · [tag code](RECORDING_GUIDE.md#18-copy-and-paste-tag-code)
 
-## React project structure
+## Project structure
 
-- `src/App.jsx` — application state, panels and dialogs.
-- `src/components/` — storefront, bag, inspector and cookie declaration.
-- `src/lib/demo-store.js` — cart events, Cookiebot listeners and the single GTM loader. React subscribes with `useSyncExternalStore`.
-- `public/config.js` — your GTM ID, Cookiebot ID and allowed hostnames.
-- `gtm/demo-basic-consent.import.json` — the same five-tag container import.
+- `src/app/` — App Router page, root layout and metadata.
+- `src/components/Storefront.tsx` — Server Component for the static storefront; uses `next/image`.
+- `src/components/ShopControls.tsx` — small client components for shopping and consent actions.
+- `src/App.tsx` — client provider, dialogs and the single **Next Script GTM loader**.
+- `src/hooks/useDemo.ts` — typed reducer and action handlers; SDK subscriptions clean up on unmount.
+- `src/domain/` — pure state transitions, product data and cart calculations.
+- `src/integrations/consent-client.ts` — typed Cookiebot/dataLayer bridge. It never creates the GTM script or owns UI state.
+- `.env.example` — public configuration variable names; actual `.env.local` stays untracked.
+- `gtm/demo-basic-consent.import.json` — the five-tag container import.
 
-`npm test` runs the React interaction and consent lifecycle tests. `npm run build` creates the Vite production bundle in `dist`; `npm run preview` serves that build locally.
+Run `npm run check` for Next.js/React lint, strict TypeScript checks, interaction and integration tests, and the production build. `npm run format` formats the source. Use `npm run build && npm start` to test the production server locally.
 
-React Strict Mode is enabled. Listener cleanup and an idempotent GTM loader prevent development remounts from installing duplicate containers. The test fixture simulates tag receipts for local tests; use the real GTM Preview and consent walkthrough above to verify the deployed integration.
+React Strict Mode is enabled. The server renders the storefront; only interactive controls and the live inspector need client code. The app does not mutate `document.body`, use `classList`, or force updates with `flushSync`. Native dialog/focus APIs use React refs. The cookie declaration SDK receives one isolated host because Cookiebot renders that document itself.
 
-Verified after the React migration on 7 September 2026: nine automated tests and the production build passed. Live denied → Statistics granted → withdrawn tests returned 2/0, 4/2 and 2/0 shop/tracked actions, with one GTM script and correct £18 order confirmations.
+Local tests use a receipt test double; they do not claim that Google Analytics or Meta received data. Use the real Cookiebot banner and Tag Assistant walkthrough above for deployed verification.
+
+Verified on 7 September 2026: `npm run check` passed (12 tests). The deployed Next.js app returned **2/0 → 4/2 → 2/0** shop/tracked actions through denied, Statistics granted and withdrawn consent. Exactly one GTM script loaded with `data-nscript="afterInteractive"`; the cookie declaration rendered successfully.

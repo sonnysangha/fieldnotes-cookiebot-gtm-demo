@@ -1487,3 +1487,22 @@ dialog::backdrop {
   width: 100%;
   margin-top: 22px;
 }
+
+.counter-change {
+  animation: counter-change 550ms ease-out;
+}
+@keyframes counter-change {
+  40% {
+    transform: scale(1.16);
+    background: #d7ddc6;
+  }
+  100% {
+    transform: scale(1);
+    background: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .counter-change {
+    animation: none;
+  }
+}
