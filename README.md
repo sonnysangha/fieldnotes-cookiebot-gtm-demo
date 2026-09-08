@@ -37,7 +37,7 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173/`. The app uses the Next.js App Router. The shop works, but tracking stays disconnected until you add your IDs below.
+Open `http://localhost:3000/`. The app uses the Next.js App Router. The shop works, but tracking stays disconnected until you add your IDs below.
 
 Deploy your copy to get a public hostname. With Vercel, import the repository and use its included configuration: the Next.js framework preset and build command `npm run build`.
 

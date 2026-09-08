@@ -3,13 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1 --port 4173",
+    "dev": "next dev",
     "build": "next build",
     "test": "vitest run",
     "lint": "eslint . --max-warnings 0",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "format": "prettier --write src next.config.ts vitest.config.ts eslint.config.js",
-    "start": "next start --hostname 127.0.0.1 --port 4173",
+    "start": "next start",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

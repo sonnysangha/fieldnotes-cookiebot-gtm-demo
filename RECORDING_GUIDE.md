@@ -241,7 +241,7 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173/`. The server serves `public/`.
+Open `http://localhost:3000/`. Next.js serves the app; static assets live in `public/`.
 
 ```bash
 npm test
