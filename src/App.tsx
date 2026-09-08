@@ -1,26 +1,15 @@
 "use client";
-import Script from "next/script";
 import type { ReactNode } from "react";
-import type { DemoConfig } from "./domain/types";
-import type { ConsentClient } from "./integrations/consent-client";
 import { ShopContext } from "./components/shop-context";
 import { useRef, useState } from "react";
-import { useDemo } from "./hooks/useDemo";
+import { useDemoContext } from "./components/DemoProvider";
 import Bag from "./components/Bag";
 import Inspector from "./components/Inspector";
 import Declaration from "./components/Declaration";
 import Dialog from "./components/Dialog";
 import { articles } from "./lib/articles";
 
-export default function App({
-  client,
-  config,
-  children,
-}: {
-  client?: ConsentClient;
-  config?: DemoConfig;
-  children: ReactNode;
-}) {
+export default function App({ children }: { children: ReactNode }) {
   const {
     state,
     add,
@@ -31,9 +20,8 @@ export default function App({
     renew,
     withdraw,
     diagnostics,
-    scriptFailed,
     mountDeclaration,
-  } = useDemo(client, config);
+  } = useDemoContext();
   const inspectorTrigger = useRef<HTMLButtonElement>(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
@@ -62,14 +50,6 @@ export default function App({
     >
       <div className={`app-shell${inspectorOpen ? " inspector-open" : ""}`}>
         {children}
-        {state.configured && config && (
-          <Script
-            id="fieldnotes-gtm"
-            src={`https://www.googletagmanager.com/gtm.js?id=${config.gtmId}`}
-            strategy="afterInteractive"
-            onError={scriptFailed}
-          />
-        )}
         <Declaration mount={mountDeclaration} open={declarationOpen} />
         <Bag
           state={state}

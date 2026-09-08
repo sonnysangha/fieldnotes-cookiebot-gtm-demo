@@ -1,16 +1,39 @@
 import { describe, it, expect, vi } from "vitest";
-import { StrictMode } from "react";
+import { StrictMode, type ReactNode } from "react";
 import { render, renderHook, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
-import App from "./App";
+import ShopApp from "./App";
+import DemoProvider from "./components/DemoProvider";
+import GtmLoader from "./components/GtmLoader";
 import Storefront from "./components/Storefront";
 import type { DemoConfig } from "./domain/types";
-import type { ConsentWindow } from "./integrations/consent-client";
+import type {
+  ConsentClient,
+  ConsentWindow,
+} from "./integrations/consent-client";
 import type { ecommerceItem } from "./domain/shop";
 import { createConsentClient } from "./integrations/consent-client";
 import { useDemo } from "./hooks/useDemo";
+
+// Mirror the root layout: loader and page share one persistent provider.
+function App({
+  client,
+  config,
+  children,
+}: {
+  client: ConsentClient;
+  config?: DemoConfig;
+  children: ReactNode;
+}) {
+  return (
+    <DemoProvider client={client} config={config}>
+      {config && <GtmLoader gtmId={config.gtmId} />}
+      <ShopApp>{children}</ShopApp>
+    </DemoProvider>
+  );
+}
 
 // Next Script is verified as a declarative boundary here; live browser tests
 // below the README's walkthrough verify the actual script execution.
@@ -146,6 +169,30 @@ describe("single-container lifecycle", () => {
       </App>,
     );
     expect(document.querySelectorAll("#fieldnotes-gtm")).toHaveLength(0);
+  });
+  it("keeps the loader and SDK connection alive when the page remounts", () => {
+    const { client, win } = setup({ config });
+    const connect = vi.spyOn(client, "connect");
+    const tree = (pageKey: string) => (
+      <DemoProvider client={client} config={config}>
+        <GtmLoader gtmId={config.gtmId} />
+        <ShopApp key={pageKey}>
+          <Storefront />
+        </ShopApp>
+      </DemoProvider>
+    );
+    const view = render(tree("first-page"));
+    const script = document.querySelector("#fieldnotes-gtm");
+    act(() => choose(win, true));
+    view.rerender(tree("second-page"));
+    expect(document.querySelector("#fieldnotes-gtm")).toBe(script);
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(win.dataLayer.filter((e) => e.event === "gtm.js")).toHaveLength(1);
+    expect(
+      screen.getByText(
+        "Cookiebot connected. Consent shown below comes from the banner.",
+      ),
+    ).toBeTruthy();
   });
   it("removes external listeners on unmount and does not duplicate them on remount", () => {
     const { client, win } = setup();

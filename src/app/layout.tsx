@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import DemoProvider from "../components/DemoProvider";
+import GtmLoader from "../components/GtmLoader";
+import { demoConfig } from "../config/demo";
 import "../style.css";
 
 export const metadata: Metadata = {
@@ -12,7 +15,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <DemoProvider config={demoConfig}>
+          <GtmLoader gtmId={demoConfig.gtmId} />
+          {children}
+        </DemoProvider>
+      </body>
     </html>
   );
 }

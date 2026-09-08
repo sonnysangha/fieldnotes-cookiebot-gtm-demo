@@ -262,7 +262,7 @@ NEXT_PUBLIC_ALLOWED_HOSTS=localhost,127.0.0.1,your-demo-domain.vercel.app
 
 The values are public browser identifiers, not secrets. Keep real credentials out of `NEXT_PUBLIC_` variables. Restart the dev server after edits.
 
-**Do not paste a second GTM snippet into this project.** `src/App.tsx` loads it once with `next/script` (`afterInteractive`), after the adapter initializes `dataLayer` and subscribes to Cookiebot events. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
+**Do not paste a second GTM snippet into this project.** `src/app/layout.tsx` mounts `GtmLoader` inside `DemoProvider`. The loader loads it once with `next/script` (`afterInteractive`), after the adapter initializes `dataLayer` and subscribes to Cookiebot events. For an ordinary website without this loader, use the snippets from GTM's installation screen: head code high in `<head>` and the provided noscript code immediately after `<body>`. [Google's installation guide](https://support.google.com/tagmanager/answer/14842164).
 
 This demo requires JavaScript and does not implement a noscript tracking path. It includes no server checkout, payment form, analytics destination or Meta pixel.
 

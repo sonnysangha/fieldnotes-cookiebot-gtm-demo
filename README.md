@@ -87,7 +87,7 @@ NEXT_PUBLIC_ALLOWED_HOSTS=localhost,127.0.0.1,your-site.vercel.app
 
 Use the same Cookiebot ID as step 4. Hostnames have no `https://` or path. Add these same variables in **Vercel → Project Settings → Environment Variables**, then redeploy. Restart `npm run dev` after changing `.env.local`.
 
-The app renders **one `next/script` component with `strategy="afterInteractive"`** after validating the hostname and preparing `dataLayer`. Cookiebot loads from the official CMP tag inside GTM. **Do not paste another GTM or Cookiebot banner script into the app.**
+The root layout mounts `GtmLoader` inside a shared `DemoProvider`. The loader renders **one `next/script` component with `strategy="afterInteractive"`** after validating the hostname and preparing `dataLayer`. Cookiebot loads from the official CMP tag inside GTM. **Do not paste another GTM or Cookiebot banner script into the app.**
 
 ## 6. Test before publishing
 
@@ -136,7 +136,9 @@ For real Google Analytics or Meta tracking, you must add and verify those destin
 - `src/app/` — App Router page, root layout and metadata.
 - `src/components/Storefront.tsx` — Server Component for the static storefront; uses `next/image`.
 - `src/components/ShopControls.tsx` — small client components for shopping and consent actions.
-- `src/App.tsx` — client provider, dialogs and the single **Next Script GTM loader**.
+- `src/components/GtmLoader.tsx` — the single **Next Script GTM loader**, mounted by the root layout.
+- `src/components/DemoProvider.tsx` — shared SDK subscription and demo state, preserved across page navigation.
+- `src/App.tsx` — shopping UI context and dialogs; it does not load GTM.
 - `src/hooks/useDemo.ts` — typed reducer and action handlers; SDK subscriptions clean up on unmount.
 - `src/domain/` — pure state transitions, product data and cart calculations.
 - `src/integrations/consent-client.ts` — typed Cookiebot/dataLayer bridge. It never creates the GTM script or owns UI state.
