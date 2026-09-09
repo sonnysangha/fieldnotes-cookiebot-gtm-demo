@@ -8,7 +8,7 @@ Use this guide when recording the tutorial or building the tags manually. **Use 
 
 The signup link is Sonny’s affiliate/referral link.
 
-This guide covers the setup from an empty GTM container, the exact demonstration tags, a recording script, testing, troubleshooting and publishing. The storefront includes a shopping bag, sample order confirmation, Cookiebot settings and a docked live inspector.
+This guide covers the setup from an empty GTM containe §r, the exact demonstration tags, a recording script, testing, troubleshooting and publishing. The storefront includes a shopping bag, sample order confirmation, Cookiebot settings and a docked live inspector.
 
 > **What is real?** GTM loads and executes the tags. Cookiebot supplies consent choices. GTM's additional consent checks gate execution. The page receives a receipt only when a demo tag actually runs. **What is simulated?** The shop and its orders are demonstrations. These tags do not send anything to GA4, Google Ads or Meta. A receipt proves demo-tag execution, not delivery to those platforms.
 
@@ -212,7 +212,7 @@ Before filming:
 
 ## 3. Understand the existing demo
 
-The hosted example loads one web container: **Fieldnotes - Cookiebot Demo (`GTM-MSQQRQ6M`)**. That container contains Cookiebot and the four consent-controlled demonstration tags. Use your own container ID for a clone.
+The hosted example loads one web container: **Fieldnotes - Cookiebot Demo (**`GTM-MSQQRQ6M`**)**. That container contains Cookiebot and the four consent-controlled demonstration tags. Use your own container ID for a clone.
 
 The same container handles every visit and consent choice. Legacy mode query parameters cannot select a different container. Its tags stay installed when consent changes; the consent checks determine whether they execute.
 
@@ -384,7 +384,7 @@ The CMP must be able to load before a visitor has granted optional consent. Do n
 
 ![Actual Cookiebot consent-update trigger and the three category tags using it](screenshots/gtm/04-consent-update-trigger.jpg)
 
-_Actual Fieldnotes GTM capture. The event name is `cookie_consent_update`; the references show the three category tags that use this trigger._
+_Actual Fieldnotes GTM capture. The event name is_ `cookie_consent_update`_; the references show the three category tags that use this trigger._
 
 This is the trigger for the category initialization tags. An All Pages trigger alone would not give them another opportunity when someone first grants consent later on that same page.
 
@@ -419,7 +419,7 @@ Then open **Advanced Settings → Consent Settings → Require additional consen
 
 ![Actual Statistics tag with analytics_storage and the consent-update trigger](screenshots/gtm/03-statistics-consent.jpg)
 
-_Actual Fieldnotes GTM capture. Show the `analytics_storage` requirement and `Cookiebot - Consent Update` trigger together: the first controls permission, the second controls when to try._
+_Actual Fieldnotes GTM capture. Show the_ `analytics_storage` _requirement and_ `Cookiebot - Consent Update` _trigger together: the first controls permission, the second controls when to try._
 
 The three category scripts contain a per-page guard. That guard is set only after the tag is permitted to execute. Repeated consent updates can retry a previously blocked category without executing a successful category twice. Keep **Once per event**; using once-per-page caused a failed retry in this particular demo's earlier testing.
 
@@ -469,7 +469,7 @@ Use this for rehearsal or recovery. For the tutorial, manually build at least th
 
 Files included:
 
-- [`gtm/demo-basic-consent.import.json`](gtm/demo-basic-consent.import.json)
+- `[gtm/demo-basic-consent.import.json](gtm/demo-basic-consent.import.json)`
 
 In an **empty rehearsal container**:
 
@@ -710,7 +710,7 @@ Paste each complete snippet into **Custom HTML**. The receipt event names and de
     window[k] = true;
     document.cookie = "demo_statistics=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Statistics demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Statistics demo tag" }),
     );
   })();
 </script>
@@ -726,7 +726,7 @@ Paste each complete snippet into **Custom HTML**. The receipt event names and de
     window[k] = true;
     document.cookie = "demo_marketing=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Marketing demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Marketing demo tag" }),
     );
   })();
 </script>
@@ -742,7 +742,7 @@ Paste each complete snippet into **Custom HTML**. The receipt event names and de
     window[k] = true;
     document.cookie = "demo_preferences=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Preferences demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Preferences demo tag" }),
     );
   })();
 </script>
@@ -753,7 +753,7 @@ Paste each complete snippet into **Custom HTML**. The receipt event names and de
 ```html
 <script>
   window.dispatchEvent(
-    new CustomEvent("demo-tag-fired", { detail: "Consented shop event" })
+    new CustomEvent("demo-tag-fired", { detail: "Consented shop event" }),
   );
 </script>
 ```

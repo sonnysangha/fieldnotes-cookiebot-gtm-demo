@@ -2,7 +2,7 @@
 
 Build a notebook shop where visitors can shop normally while optional tracking waits for consent. This tutorial uses **one GTM Web container**, the official Cookiebot CMP template, and four small demonstration tags.
 
-**[Sign up for Cookiebot by Usercentrics](https://usercentrics.sjv.io/sonnysangha)** · [Presenter's recording guide](RECORDING_GUIDE.md)
+**[Sign up for Cookiebot by Usercentrics](https://usercentrics.sjv.io/sonnysangha)**
 
 The signup link is Sonny's affiliate/referral link.
 
@@ -31,7 +31,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://localhost:3000/**. Shopping works before the tracking configuration is connected.
+Open **[http://localhost:3000/](http://localhost:3000/)**. Shopping works before the tracking configuration is connected.
 
 In another terminal, from the same project folder:
 
@@ -55,7 +55,7 @@ You can also import your own GitHub copy in Vercel's dashboard. [Vercel deployme
 
 ## 3. Create one GTM container and enable Consent Overview
 
-In [Google Tag Manager](https://tagmanager.google.com/), create a demo account if needed, then create one **Web** container. Copy its **`GTM-…` container ID**. A `G-…` Analytics ID is not the container ID.
+In [Google Tag Manager](https://tagmanager.google.com/), create a demo account if needed, then create one **Web** container. Copy its `GTM-…` **container ID**. A `G-…` Analytics ID is not the container ID.
 
 Before adding tags:
 
@@ -118,7 +118,7 @@ The CMP must load before the visitor has chosen optional consent. Do not require
 
 ![Cookiebot CMP configuration](screenshots/gtm/02-cookiebot-cmp.jpg)
 
-_Existing demo configuration screenshot. Use your own Domain Group ID. The import's other defaults are automatic language, `.com` CDN, wait-for-update 2000 ms, URL passthrough off, dynamic ads-data redaction and TCF off; these are demo settings, not universal production recommendations._
+_Existing demo configuration screenshot. Use your own Domain Group ID. The import's other defaults are automatic language,_ `.com` _CDN, wait-for-update 2000 ms, URL passthrough off, dynamic ads-data redaction and TCF off; these are demo settings, not universal production recommendations._
 
 ## 6. Create the two triggers
 
@@ -127,7 +127,7 @@ For each one, open **Triggers → New → Custom Event**, enter the settings bel
 | Trigger name                 | Event name              | Use regex matching |
 | ---------------------------- | ----------------------- | ------------------ |
 | `Cookiebot - Consent Update` | `cookie_consent_update` | Off                |
-| `Demo - Shop Events`         | `^(add_to_cart          | purchase)$`        | On  |
+| `Demo - Shop Events`         | `^(add_to_cart          | purchase)$`        |
 
 The first gives category tags a chance to run when consent is available. The second matches an actual shop action. **Do not replace purchase triggers with the consent-update trigger:** agreeing to cookies is not a purchase.
 
@@ -153,8 +153,7 @@ For each row below:
 
 The category code avoids repeating a successful initialization on the same page. The shop tag runs once for each permitted addition or purchase. These permissions describe these demo tags; review the behavior of real services before choosing their requirements.
 
-<details>
-<summary>Demo - Statistics receipt — copy code</summary>
+Demo - Statistics receipt — copy code
 
 ```html
 <script>
@@ -164,16 +163,13 @@ The category code avoids repeating a successful initialization on the same page.
     window[k] = true;
     document.cookie = "demo_statistics=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Statistics demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Statistics demo tag" }),
     );
   })();
 </script>
 ```
 
-</details>
-
-<details>
-<summary>Demo - Marketing receipt — copy code</summary>
+Demo - Marketing receipt — copy code
 
 ```html
 <script>
@@ -183,16 +179,13 @@ The category code avoids repeating a successful initialization on the same page.
     window[k] = true;
     document.cookie = "demo_marketing=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Marketing demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Marketing demo tag" }),
     );
   })();
 </script>
 ```
 
-</details>
-
-<details>
-<summary>Demo - Preferences receipt — copy code</summary>
+Demo - Preferences receipt — copy code
 
 ```html
 <script>
@@ -202,26 +195,21 @@ The category code avoids repeating a successful initialization on the same page.
     window[k] = true;
     document.cookie = "demo_preferences=1; Path=/; SameSite=Lax";
     window.dispatchEvent(
-      new CustomEvent("demo-tag-fired", { detail: "Preferences demo tag" })
+      new CustomEvent("demo-tag-fired", { detail: "Preferences demo tag" }),
     );
   })();
 </script>
 ```
 
-</details>
-
-<details>
-<summary>Demo - Consented shop event receipt — copy code</summary>
+Demo - Consented shop event receipt — copy code
 
 ```html
 <script>
   window.dispatchEvent(
-    new CustomEvent("demo-tag-fired", { detail: "Consented shop event" })
+    new CustomEvent("demo-tag-fired", { detail: "Consented shop event" }),
   );
 </script>
 ```
-
-</details>
 
 ![Statistics permission and trigger together](screenshots/gtm/03-statistics-consent.jpg)
 

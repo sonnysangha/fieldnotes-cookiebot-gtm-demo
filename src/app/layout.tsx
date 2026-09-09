@@ -17,6 +17,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <DemoProvider config={demoConfig}>
+          {/* <script
+            id="Cookiebot"
+            src="https://consent.cookiebot.com/uc.js"
+            data-cbid="ba4ebbcb-df61-4020-8ac5-b9638ea18c08"
+            data-blockingmode="auto"
+            type="text/javascript"
+          ></script> */}
           <GtmLoader gtmId={demoConfig.gtmId} />
           {children}
         </DemoProvider>
