@@ -1,6 +1,8 @@
-# Follow along: Cookiebot + Google Tag Manager
+# Cookiebot Setup Demo
 
-Build a notebook shop where visitors can shop normally while optional tracking waits for consent. This tutorial uses **one GTM Web container**, the official Cookiebot CMP template, and four small demonstration tags.
+This repository accompanies our YouTube video, where we walk through setting up Cookiebot and explore the benefits of using it for consent management with Google Tag Manager.
+
+Follow along by building a notebook shop where visitors can shop normally while optional tracking waits for consent. The demo uses **one GTM Web container**, the official Cookiebot CMP template, and four small demonstration tags.
 
 **[Sign up for Cookiebot by Usercentrics](https://usercentrics.sjv.io/sonnysangha)**
 
@@ -25,8 +27,8 @@ You need Node.js 24.15+, Git, a Cookiebot account, a GTM account and a website h
 ## 1. Run and deploy your copy
 
 ```bash
-git clone https://github.com/sonnysangha/fieldnotes-cookiebot-gtm-demo.git
-cd fieldnotes-cookiebot-gtm-demo
+git clone https://github.com/sonnysangha/Cookiebot-Setup-Demo.git
+cd Cookiebot-Setup-Demo
 npm ci
 npm run dev
 ```
